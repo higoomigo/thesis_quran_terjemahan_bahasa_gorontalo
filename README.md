@@ -41,6 +41,7 @@ Sistem ini memiliki *Role-Based Access Control* (RBAC) yang spesifik:
 Pengembangan data dan validasi pada sistem ini terwujud atas dukungan dan kerja sama dari:
 *   **Universitas Negeri Gorontalo (UNG)**
 *   **Pemerintah Provinsi Gorontalo**
+*   **Kementerian Agama RI**
 *   **Majelis Ulama Indonesia (MUI) Provinsi Gorontalo**
 *   **IPQAH (Ikatan Persaudaraan Qari-Qariah) Gorontalo**
 
