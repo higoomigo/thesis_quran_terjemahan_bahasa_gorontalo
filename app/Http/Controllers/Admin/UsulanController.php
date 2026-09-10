@@ -25,7 +25,7 @@ class UsulanController extends Controller
         }, function ($query) {
             // JIKA TIDAK ADA filter status (tampilan default semua data)
             // KUNCI PERBAIKAN: Sembunyikan yang 'diarsipkan' DAN 'dipublikasi' sekaligus
-            return $query->whereNotIn('status', ['diarsipkan', 'dipublikasi']);
+            return $query->whereNotIn('status', ['menunggu','diarsipkan', 'dipublikasi']);
         })
         ->when(request('search'), function ($query) {
             // Gunakan grouping agar kondisi OR tidak membocorkan filter status
@@ -39,7 +39,7 @@ class UsulanController extends Controller
         ->withQueryString(); // KUNCI UTAMA: Menjaga filter tetap aktif saat pindah halaman
 
     $statusCount = [
-        'menunggu' => Usulan::where('status', 'menunggu')->count(),
+        'menunggu_validasi' => Usulan::where('status', 'menunggu_validasi')->count(),
         'diterima' => Usulan::where('status', 'diterima')->count(),
         'ditolak' => Usulan::where('status', 'ditolak')->count(),
         // 'dipublikasi' => Usulan::where('status', 'dipublikasi')->count(),
@@ -122,85 +122,7 @@ class UsulanController extends Controller
         return response()->json(['success' => true, 'message' => 'Klaim berhasil.']);
     }
 
-    // public function approve(Request $request, $id)
-    // {
-    //     try {
-    //         $usulan = Usulan::findOrFail($id);
-
-    //         $request->validate([
-    //             'catatan_pakar' => 'nullable|string|max:1000'
-    //         ]);
-
-    //         $usulan->update([
-    //             'status' => 'diterima',
-    //             'catatan_pakar' => $request->catatan_pakar,
-    //             'validator_id' => auth()->id(),
-    //             'validated_at' => now()
-    //         ]);
-
-    //         if ($request->ajax()) {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'message' => 'Usulan berhasil diterima'
-    //             ]);
-    //         }
-
-    //         return redirect()->route('admin.usulan.index')
-    //             ->with('success', 'Usulan berhasil diterima');
-    //     } catch (\Exception $e) {
-    //         if ($request->ajax()) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Gagal menerima usulan: ' . $e->getMessage()
-    //             ], 500);
-    //         }
-
-    //         return redirect()->route('admin.usulan.index')
-    //             ->with('error', 'Gagal menerima usulan: ' . $e->getMessage());
-    //     }
-    // }
-
-    // public function reject(Request $request, $id)
-    // {
-    //     try {
-    //         $usulan = Usulan::findOrFail($id);
-
-    //         $request->validate([
-    //             'catatan_pakar' => 'required|string|min:5|max:1000'
-    //         ], [
-    //             'catatan_pakar.required' => 'Catatan penolakan harus diisi',
-    //             'catatan_pakar.min' => 'Catatan penolakan minimal 5 karakter'
-    //         ]);
-
-    //         $usulan->update([
-    //             'status' => 'ditolak',
-    //             'catatan_pakar' => $request->catatan_pakar,
-    //             'validator_id' => auth()->id(),
-    //             'validated_at' => now()
-    //         ]);
-
-    //         if ($request->ajax()) {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'message' => 'Usulan berhasil ditolak'
-    //             ]);
-    //         }
-
-    //         return redirect()->route('admin.usulan.index')
-    //             ->with('success', 'Usulan berhasil ditolak');
-    //     } catch (\Exception $e) {
-    //         if ($request->ajax()) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Gagal menolak usulan: ' . $e->getMessage()
-    //             ], 500);
-    //         }
-
-    //         return redirect()->route('admin.usulan.index')
-    //             ->with('error', 'Gagal menolak usulan: ' . $e->getMessage());
-    //     }
-    // }
-
+   
     private function getStatusBadge($status)
     {
         switch ($status) {
@@ -246,21 +168,5 @@ class UsulanController extends Controller
         return redirect()->back()->with('success', 'Status usulan berhasil diperbarui');
     }
 
-    public function destroy($id)
-    {
-        $usulan = Usulan::findOrFail($id);
-        $usulan->delete();
-
-        return redirect()->route('admin.usulan.index')->with('success', 'Usulan berhasil dihapus');
-    }
-
-    // Fungsi Arsip
-    public function arsip($id)
-    {
-        $usulan = Usulan::findOrFail($id);
-        // Ubah statusnya jadi 'diarsipkan' (pastikan ini dibolehin di database lu)
-        $usulan->update(['status' => 'diarsipkan']);
-
-        return back()->with('success', 'Usulan berhasil diarsipkan.');
-    }
+    
 }

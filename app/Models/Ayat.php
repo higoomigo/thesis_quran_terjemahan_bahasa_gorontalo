@@ -46,4 +46,9 @@ class Ayat extends Model
     {
         return "{$this->no_surah}:{$this->nomorAyat}";
     }
+
+    public function ayatAudios()
+    {
+        return $this->hasMany(AyatAudio::class, 'ayat_id');
+    }
 }

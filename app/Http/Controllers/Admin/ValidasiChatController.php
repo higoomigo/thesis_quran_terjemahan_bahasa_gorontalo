@@ -123,9 +123,9 @@ class ValidasiChatController extends Controller
         }
 
         // Cek apakah tim sudah lengkap
-        if ($usulan->assignments->count() < 3) {
-            return response()->json(['error' => 'Tim validator belum lengkap'], 400);
-        }
+        // if ($usulan->assignments->count() < 3) {
+        //     return response()->json(['error' => 'Tim validator belum lengkap'], 400);
+        // }
 
         // Cek apakah sudah kadaluarsa
         if ($usulan->batas_waktu_diskusi && now()->gt($usulan->batas_waktu_diskusi)) {

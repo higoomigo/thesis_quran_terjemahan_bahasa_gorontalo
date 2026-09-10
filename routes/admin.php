@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ValidasiController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 // use App\Http\Controllers\Admin\RiwayatController;\
 use App\Http\Controllers\Admin\ValidasiChatController;
+use App\Http\Controllers\Backend\AudioController;
 use App\Http\Controllers\ProfileController;
 
 // use App\Http\Controllers\Admin\AuthController;
@@ -25,12 +26,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/{id}', [UsulanController::class, 'show'])->name('show');
         Route::delete('/{id}', [UsulanController::class, 'destroy'])->name('destroy');
         Route::patch('/{id}/status', [UsulanController::class, 'updateStatus'])->name('status');
-        Route::patch('/{id}/approve', [UsulanController::class, 'approve'])->name('approve');
-        Route::post('/{id}/claim', [UsulanController::class, 'claim'])->name('claim');
-        Route::patch('/{id}/reject', [UsulanController::class, 'reject'])->name('reject');
-        // Pastikan route ini ditaruh di dalam middleware admin/editor
-        Route::patch('/usulan/{id}/arsip', [UsulanController::class, 'arsip'])->name('arsip');
-        Route::delete('/usulan/{id}', [UsulanController::class, 'destroy'])->name('destroy');
+     
     });
 
     Route::get('/profil', [ProfileController::class, 'adminProfile'])->name('profile.show');
@@ -48,6 +44,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     });
 
     Route::get('/riwayat', [RiwayatValidasiController::class, 'index'])->name('riwayat');
+
+    
     // Route::middleware(['auth'])->group(function () {
     //     Route::get('/validasi', [ValidasiController::class, 'index'])->name('validasi.index');
     //     Route::get('/usulan/{id}/chat', function($id) {

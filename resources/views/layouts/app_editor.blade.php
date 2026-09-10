@@ -5,12 +5,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ $title ?? '-- |' }}{{ config('app.name', 'Laravel') }}</title>
+        <title>@yield('title')</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+        <script defer src="[https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js](https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js)"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
         <style>
@@ -95,16 +98,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-gray-50 text-gray-900 h-screen flex">
-    @if(Auth::user()->role === 'admin')
+        @if(Auth::user()->role === 'admin')
             @include('partials.sidebar_admin')
         @elseif(Auth::user()->role === 'editor' || Auth::user()->role === 'teologi' || Auth::user()->role === 'linguistik')
             @include('partials.sidebar')
         @endif
 
-
-            <!-- Page Heading -->
-
-            <!-- Page Content -->
+        
                 @yield('content')
     </body>
 </html>

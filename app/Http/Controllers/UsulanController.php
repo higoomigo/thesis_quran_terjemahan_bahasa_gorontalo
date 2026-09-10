@@ -73,7 +73,7 @@ class UsulanController extends Controller
                 'nama_pengusul' => $validated['nama_pengusul'],
                 'no_hp' => $validated['no_hp'],
                 'usulan_teks' => $validated['usulan_teks'],
-                'status' => 'menunggu',
+                'status' => '',
             ]);
 
             DB::commit();
@@ -98,57 +98,5 @@ class UsulanController extends Controller
         }
     }
 
-    public function claim($id)
-    {
-        // 1. Cari data usulan
-        $usulan = Usulan::findOrFail($id);
-        $user = Auth::user();
-
-        // 2. Cek apakah usulan ini masih "menunggu"
-        if ($usulan->status !== 'menunggu') {
-            return response()->json(['success' => false, 'message' => 'Usulan ini sudah diproses.'], 400);
-        }
-
-        // 3. Cek apakah user ini sudah pernah mengklaim usulan yang sama
-        $alreadyClaimed = UsulanAssignment::where('usulan_id', $usulan->id)
-            ->where('user_id', $user->id)
-            ->exists();
-        if ($alreadyClaimed) {
-            return response()->json(['success' => false, 'message' => 'Anda sudah berada di tim validator ini.'], 400);
-        }
-
-        // 4. Logika Kuota Berdasarkan Role
-        // (Asumsi di tabel users lu sudah ada kolom 'role' berisi 'teologi' atau 'linguistik')
-        $role = $user->role;
-
-        $currentRoleCount = UsulanAssignment::where('usulan_id', $usulan->id)
-            ->whereHas('user', function ($query) use ($role) {
-                $query->where('role', $role);
-            })->count();
-
-        if ($role === 'teologi' && $currentRoleCount >= 2) {
-            return response()->json(['success' => false, 'message' => 'Kuota pakar Teologi (Maks 2) sudah penuh.'], 400);
-        }
-
-        if ($role === 'linguistik' && $currentRoleCount >= 1) {
-            return response()->json(['success' => false, 'message' => 'Kuota pakar Linguistik (Maks 1) sudah penuh.'], 400);
-        }
-
-        // 5. Masukkan user ke tim (Tabel Pivot)
-        UsulanAssignment::create([
-            'usulan_id' => $usulan->id,
-            'user_id' => $user->id,
-            'status' => 'aktif'
-        ]);
-
-        // 6. Cek apakah tim sudah lengkap (3 orang). Jika ya, set batas waktu diskusi
-        $totalTeamMembers = UsulanAssignment::where('usulan_id', $usulan->id)->count();
-
-        if ($totalTeamMembers === 3) {
-            $usulan->batas_waktu_diskusi = Carbon::now()->addDays(14); // Set 2 minggu
-            $usulan->save();
-        }
-
-        return response()->json(['success' => true, 'message' => 'Klaim berhasil.']);
-    }
+    
 }

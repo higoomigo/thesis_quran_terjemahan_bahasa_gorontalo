@@ -141,7 +141,12 @@
                             class="h-16 md:h-20 lg:h-24 object-contain  transition-all duration-300">
                     </div>
 
-                    <div class="group flex items-center justify-center cursor-pointer"
+                    <div class="group flex items-center justify-center cursor-pointer" title="IPQOH Gorontalo">
+                        <img src="{{ asset('img/logo_ipqoh.png') }}" alt="IPQOH Gorontalo"
+                            class="h-16 md:h-20 lg:h-24 object-contain  transition-all duration-300">
+                    </div>
+
+                    {{-- <div class="group flex items-center justify-center cursor-pointer"
                         title="Ikatan Persaudaraan Qari-Qariah dan Hafiz-Hafizah">
                         <div
                             class="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full border-2 border-slate-300 bg-slate-50 group-hover:border-emerald-700 group-hover:bg-emerald-50 flex items-center justify-center text-center p-1 shadow-sm transition-all duration-300">
@@ -150,7 +155,7 @@
                                 IPQOH<br>Gorontalo
                             </span>
                         </div>
-                    </div>
+                    </div> --}}
 
                 </div>
             </div>

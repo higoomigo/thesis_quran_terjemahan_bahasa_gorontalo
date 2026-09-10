@@ -120,6 +120,8 @@
     <div class="flex-1 min-w-0 h-screen overflow-y-auto bg-gray-50">
         @yield('content')
     </div>
+
+    <x-toaster />
 </body>
 
 </html>

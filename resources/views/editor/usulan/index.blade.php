@@ -28,29 +28,29 @@
         </header>
 
         <!-- Stats Overview -->
-        <section class="max-w-6xl mx-auto grid grid-cols-12 gap-6 mb-8">
+        {{-- <section class="max-w-6xl mx-auto grid grid-cols-12 gap-6 mb-8">
             <div class="col-span-8 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Total Usulan</p>
                         <h3 class="text-4xl font-bold text-emerald-800 leading-none">
-                            {{ number_format($statusCount['menunggu_validasi'] + $statusCount['diterima'] + $statusCount['ditolak']) }}
+                            {{ number_format($statusCount['menunggu'] + $statusCount['diterima'] + $statusCount['ditolak']) }}
                         </h3>
                         <p class="text-xs text-emerald-700 font-medium mt-4 flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm">pending</span>
-                            {{ $statusCount['menunggu_validasi'] }} Menunggu Review
+                            {{ $statusCount['menunggu'] }} Menunggu Review
                         </p>
                     </div>
                     <div class="h-24 w-48 relative">
                         <div class="absolute bottom-0 left-0 w-full h-full flex items-end gap-1">
                             <div
-                                class="w-1/3 bg-yellow-400 h-[{{ $statusCount['menunggu_validasi'] > 0 ? min(95, ($statusCount['menunggu_validasi'] / max(1, $statusCount['menunggu_validasi'] + $statusCount['diterima'] + $statusCount['ditolak'])) * 100) : 5 }}%] rounded-t-sm">
+                                class="w-1/3 bg-yellow-400 h-[{{ $statusCount['menunggu'] > 0 ? min(95, ($statusCount['menunggu'] / max(1, $statusCount['menunggu'] + $statusCount['diterima'] + $statusCount['ditolak'])) * 100) : 5 }}%] rounded-t-sm">
                             </div>
                             <div
-                                class="w-1/3 bg-green-500 h-[{{ $statusCount['diterima'] > 0 ? min(95, ($statusCount['diterima'] / max(1, $statusCount['menunggu_validasi'] + $statusCount['diterima'] + $statusCount['ditolak'])) * 100) : 5 }}%] rounded-t-sm">
+                                class="w-1/3 bg-green-500 h-[{{ $statusCount['diterima'] > 0 ? min(95, ($statusCount['diterima'] / max(1, $statusCount['menunggu'] + $statusCount['diterima'] + $statusCount['ditolak'])) * 100) : 5 }}%] rounded-t-sm">
                             </div>
                             <div
-                                class="w-1/3 bg-red-500 h-[{{ $statusCount['ditolak'] > 0 ? min(95, ($statusCount['ditolak'] / max(1, $statusCount['menunggu_validasi'] + $statusCount['diterima'] + $statusCount['ditolak'])) * 100) : 5 }}%] rounded-t-sm">
+                                class="w-1/3 bg-red-500 h-[{{ $statusCount['ditolak'] > 0 ? min(95, ($statusCount['ditolak'] / max(1, $statusCount['menunggu'] + $statusCount['diterima'] + $statusCount['ditolak'])) * 100) : 5 }}%] rounded-t-sm">
                             </div>
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                 <div class="flex gap-4 mt-4 pt-2 border-t border-gray-100">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                        <span class="text-xs text-gray-500">Menunggu: {{ $statusCount['menunggu_validasi'] }}</span>
+                        <span class="text-xs text-gray-500">Menunggu: {{ $statusCount['menunggu'] }}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 rounded-full bg-green-500"></div>
@@ -74,7 +74,7 @@
                 <div>
                     <span class="material-symbols-outlined text-3xl mb-4">assignment_late</span>
                     <p class="text-sm font-semibold">Perlu Perhatian</p>
-                    <p class="text-xs opacity-80 mt-1">{{ $statusCount['menunggu_validasi'] }} usulan menunggu untuk direview.
+                    <p class="text-xs opacity-80 mt-1">{{ $statusCount['menunggu'] }} usulan menunggu untuk direview.
                     </p>
                 </div>
                 <button onclick="document.getElementById('search').focus()"
@@ -82,7 +82,7 @@
                     Mulai Review
                 </button>
             </div>
-        </section>
+        </section> --}}
 
         <!-- Search & Filter Controls -->
         <div
@@ -112,8 +112,8 @@
                             class="block px-4 py-2 text-sm hover:bg-gray-50 transition-colors {{ !request('status') ? 'text-emerald-600 font-medium' : 'text-gray-700' }}">
                             Semua Status
                         </a>
-                        <a href="{{ route('admin.usulan.index', ['status' => 'menunggu_validasi', 'search' => request('search')]) }}"
-                            class="block px-4 py-2 text-sm hover:bg-gray-50 transition-colors {{ request('status') == 'menunggu_validasi' ? 'text-emerald-600 font-medium bg-yellow-50' : 'text-gray-700' }}">
+                        <a href="{{ route('admin.usulan.index', ['status' => 'menunggu', 'search' => request('search')]) }}"
+                            class="block px-4 py-2 text-sm hover:bg-gray-50 transition-colors {{ request('status') == 'menunggu' ? 'text-emerald-600 font-medium bg-yellow-50' : 'text-gray-700' }}">
                             ⏳ Menunggu
                         </a>
                         <a href="{{ route('admin.usulan.index', ['status' => 'diterima', 'search' => request('search')]) }}"
@@ -150,7 +150,7 @@
                         <th class="px-6 py-4 font-semibold text-sm">Usulan (Hulontalo)</th>
                         <th class="px-6 py-4 font-semibold text-sm">Pengirim</th>
                         <th class="px-6 py-4 font-semibold text-sm">Waktu</th>
-                        <th class="px-6 py-4 font-semibold text-sm">Status</th>
+                        {{-- <th class="px-6 py-4 font-semibold text-sm">Status</th> --}}
                         <th class="px-6 py-4 font-semibold text-sm text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -172,7 +172,7 @@
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-2">
                                     <div
-                                        class="w-8 h-8 rounded-full {{ $item->status == 'menunggu_validasi' ? 'bg-yellow-100 text-yellow-700' : ($item->status == 'diterima' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') }} flex items-center justify-center font-bold text-[10px]">
+                                        class="w-8 h-8 rounded-full {{ $item->status == 'menunggu' ? 'bg-yellow-100 text-yellow-700' : ($item->status == 'diterima' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') }} flex items-center justify-center font-bold text-[10px]">
                                         {{ strtoupper(substr($item->nama_pengusul, 0, 2)) }}
                                     </div>
                                     <div>
@@ -185,10 +185,10 @@
                                 <span class="text-xs text-gray-500">{{ $item->created_at->diffForHumans() }}</span>
                                 <p class="text-xs text-gray-400">{{ $item->created_at->format('d/m/Y H:i') }}</p>
                             </td>
-                            <td class="px-6 py-5">
+                            {{-- <td class="px-6 py-5">
                                 <div class="flex flex-col items-start gap-2">
 
-                                    @if ($item->status == 'menunggu_validasi')
+                                    @if ($item->status == 'menunggu')
                                         @php
                                             // Menghitung jumlah pakar yang sudah klaim
                                             $jumlahValidator = $item->assignments->count();
@@ -202,11 +202,11 @@
                                         </div>
                                     @endif
                                 </div>
-                            </td>
+                            </td> --}}
                             <td class="px-6 py-5 text-right">
                                 <div class="flex items-center justify-end gap-2">
 
-                                    @if ($item->status == 'menunggu_validasi')
+                                    {{-- @if ($item->status == 'menunggu')
                                         @if (isset($jumlahValidator) && $jumlahValidator >= 3)
                                             <div class="text-gray-400 bg-gray-50 px-3 py-1.5 border border-gray-200 rounded-2xl flex items-center gap-1 cursor-not-allowed"
                                                 title="Kuota validator sudah penuh (3/3)">
@@ -222,7 +222,7 @@
                                                 <p class="text-sm font-medium">Klaim</p>
                                             </button>
                                         @endif
-                                    @endif
+                                    @endif --}}
 
                                     <button onclick="showDetail({{ $item->id }})"
                                         class="text-emerald-600 hover:bg-emerald-50 p-2 rounded-full transition-colors"
@@ -234,7 +234,19 @@
                                         @if (in_array(Auth::user()->role, ['admin', 'editor']))
                                             <div class="w-px h-6 bg-gray-200 mx-1"></div>
 
-                                            <form action="{{ route('admin.usulan.arsip', $item->id) }}" method="POST"
+                                            <form action="{{ route('editor.usulan.accept', $item->id) }}" method="POST"
+                                                class="inline-block m-0">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                    onclick="return confirm('Terima dan teruskan usulan ini?.')"
+                                                    class="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 p-2 rounded-full transition-colors flex items-center justify-center"
+                                                    title="Terima Usulan">
+                                                    <span class="material-symbols-outlined text-xl">check_circle</span>
+                                                </button>
+                                            </form>
+
+                                            <form action="{{ route('editor.usulan.arsip', $item->id) }}" method="POST"
                                                 class="inline-block m-0">
                                                 @csrf
                                                 @method('PATCH')
@@ -246,7 +258,7 @@
                                                 </button>
                                             </form>
 
-                                            <form action="{{ route('admin.usulan.destroy', $item->id) }}" method="POST"
+                                            <form action="{{ route('editor.usulan.destroy', $item->id) }}" method="POST"
                                                 class="inline-block m-0">
                                                 @csrf
                                                 @method('DELETE')
@@ -632,7 +644,7 @@
 
         function getStatusBadgeClass(status) {
             switch (status) {
-                case 'menunggu_validasi':
+                case 'menunggu':
                     return 'bg-yellow-100 text-yellow-800';
                 case 'diterima':
                     return 'bg-green-100 text-green-800';
@@ -645,8 +657,8 @@
 
         function getStatusText(status) {
             switch (status) {
-                case 'menunggu_validasi':
-                    return 'Menunggu_validasi';
+                case 'menunggu':
+                    return 'Menunggu';
                 case 'diterima':
                     return 'Diterima';
                 case 'ditolak':
