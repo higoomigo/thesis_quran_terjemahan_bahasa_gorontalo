@@ -114,7 +114,7 @@
         <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
             <a class="text-lg font-bold tracking-tight text-emerald-800 flex items-center gap-2"
                 href="{{ route('mushaf') ?? '#' }}">
-                Qur'an Gorontalo
+                Qur'an Hulontalo
             </a>
             <a href="{{ isset($data_surah) ? route('surah.show', $data_surah->no_surah) : '#' }}"
                 class="inline-flex items-center gap-1 text-gray-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-1.5 rounded-lg font-bold text-sm transition-all">
@@ -140,9 +140,9 @@
                 </button>
             </div>
 
-            <div class="space-y-6">
-                <div
-                    class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
+            <div
+                class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 space-y-6">
+                <div class="">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1">
                             <p class="arabic-text text-3xl leading-loose text-gray-900">
@@ -157,10 +157,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-400">
-                        <span>QS {{ $data_surah->no_surah ?? '?' }}:{{ $data_ayat->nomorAyat ?? '?' }}</span>
-                        <span>{{ $data_surah->nama_latin ?? '' }}</span>
-                    </div>
+
                 </div>
 
                 <div
@@ -179,45 +176,57 @@
                         </div>
                     @endif
                 </div>
+                <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-400">
+                    <span>QS {{ $data_surah->no_surah ?? '?' }}:{{ $data_ayat->nomorAyat ?? '?' }}</span>
+                    <span>{{ $data_surah->nama_latin ?? '' }}</span>
+                </div>
             </div>
         </section>
 
+        {{-- ==================== JEJAK SEJARAH & KEPUTUSAN VALIDASI ==================== --}}
         <section class="py-8 border-b border-gray-300">
             <div class="mb-6">
                 <h2 class="text-2xl font-black text-emerald-800 flex items-center gap-2">
                     <span class="material-symbols-outlined text-3xl">history_edu</span>
-                    Jejak Sejarah Terjemahan
+                    Jejak Sejarah & Keputusan Validasi
                 </h2>
-                <p class="text-sm text-gray-600 mt-1 font-medium">Daftar perjalanan perubahan terjemahan ayat dari waktu
-                    ke waktu.</p>
+                <p class="text-sm text-gray-600 mt-1 font-medium">
+                    Menampilkan semua hasil validasi (diterima maupun ditolak) beserta perubahan terjemahan.
+                </p>
             </div>
 
             <div class="space-y-6">
-                @forelse($riwayat_terjemahans ?? [] as $riwayat)
+                {{-- A. RIWAYAT PERUBAHAN TEKS (dari tabel riwayat_terjemahan) --}}
+                @forelse($riwayat_terjemahans as $riwayat)
                     <div
-                        class="group relative pl-6 sm:pl-10 border-l-4 {{ in_array($riwayat->usulan->status ?? '', ['diterima', 'dipublikasi']) ? 'border-emerald-400' : 'border-gray-300' }} transition-all duration-300 hover:border-emerald-500">
+                        class="group relative pl-6 sm:pl-10 border-l-4 border-emerald-400 transition-all duration-300 hover:border-emerald-500">
                         <div
-                            class="absolute -left-[12px] top-0 w-5 h-5 rounded-full bg-white border-4 {{ in_array($riwayat->usulan->status ?? '', ['diterima', 'dipublikasi']) ? 'border-emerald-500' : 'border-gray-300' }} transition-transform duration-300 group-hover:scale-125 shadow-sm">
+                            class="absolute -left-[12px] top-0 w-5 h-5 rounded-full bg-white border-4 border-emerald-500 shadow-sm">
                         </div>
 
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
                             <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span
+                                        class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full">DITERIMA
+                                        & DIPUBLIKASI</span>
+                                </div>
                                 <h3 class="text-lg font-bold text-gray-900">
                                     {{ $riwayat->created_at ? $riwayat->created_at->translatedFormat('d F Y') : '-' }}
                                 </h3>
-                                <p class="text-xs text-gray-500 font-medium">Diusulkan oleh: <span
+                                <p class="text-xs text-gray-500 font-medium">
+                                    Diusulkan oleh: <span
                                         class="font-bold text-gray-700">{{ $riwayat->usulan->nama_pengusul ?? 'Anonim' }}</span>
                                 </p>
                             </div>
                             <button onclick="bukaModalRiwayat({{ $riwayat->id }})"
-                                class="w-full sm:w-auto bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-400 px-4 py-1.5 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-1 shadow-sm group-hover:shadow-md">
+                                class="w-full sm:w-auto bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-400 px-4 py-1.5 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-1 shadow-sm">
                                 <span class="material-symbols-outlined text-base">plumbing</span>
-                                LIHAT DETAIL PROSES
+                                LIHAT DETAIL
                             </button>
                         </div>
 
-                        <div
-                            class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm group-hover:shadow-md transition-shadow">
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Terjemahan yang
                                 disahkan:</p>
                             <p class="text-xl text-emerald-900 font-bold leading-relaxed">
@@ -226,28 +235,31 @@
                         </div>
                     </div>
 
+                    {{-- Modal Detail Riwayat (tetap sama seperti sebelumnya) --}}
                     <div id="modal-riwayat-{{ $riwayat->id }}"
-                        class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm transition-opacity">
+                        class="hidden fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm">
                         <div
                             class="modal-enter bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+                            {{-- Header Modal --}}
                             <div class="bg-emerald-800 px-5 py-3 flex justify-between items-center shrink-0">
                                 <div>
                                     <h3 class="text-xl font-black text-white flex items-center gap-2">
                                         <span class="material-symbols-outlined text-2xl">task_alt</span>
                                         Laporan Otentikasi Terjemahan
                                     </h3>
-                                    <p class="text-emerald-200 text-xs mt-0.5">ID Riwayat: #{{ $riwayat->id }} |
-                                        Tanggal:
+                                    <p class="text-emerald-200 text-xs mt-0.5">
+                                        ID Riwayat: #{{ $riwayat->id }} |
                                         {{ $riwayat->created_at ? $riwayat->created_at->translatedFormat('d F Y') : '-' }}
                                     </p>
                                 </div>
                                 <button onclick="tutupModalRiwayat({{ $riwayat->id }})"
-                                    class="bg-red-500 text-white hover:bg-red-600 px-3 py-1.5 rounded-lg font-bold text-sm flex items-center gap-1 transition-colors">
+                                    class="bg-red-500 text-white hover:bg-red-600 px-3 py-1.5 rounded-lg font-bold text-sm flex items-center gap-1">
                                     <span class="material-symbols-outlined text-base">close</span> TUTUP
                                 </button>
                             </div>
 
                             <div class="p-5 sm:p-6 overflow-y-auto custom-scrollbar space-y-6 bg-gray-50/50">
+                                {{-- Konteks Ayat --}}
                                 <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                                     <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-3">
                                         <h4 class="text-sm font-bold text-gray-800 flex items-center gap-1">
@@ -256,41 +268,40 @@
                                             Konteks Ayat
                                         </h4>
                                         <span
-                                            class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-bold">QS
-                                            {{ $data_surah->no_surah ?? '?' }}:{{ $data_ayat->nomorAyat ?? '?' }}</span>
+                                            class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-xs font-bold">
+                                            QS {{ $data_surah->no_surah }}:{{ $data_ayat->nomorAyat }}
+                                        </span>
                                     </div>
-                                    <p class="arabic-text text-2xl">{{ $data_ayat->Arab ?? '' }}</p>
+                                    <p class="arabic-text text-2xl">{{ $data_ayat->Arab }}</p>
                                 </div>
 
+                                {{-- Perubahan Teks --}}
                                 <div>
                                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Perubahan
                                         Teks Terjemahan</h4>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div class="bg-white p-4 rounded-lg border-l-4 border-red-400 shadow-sm">
                                             <p
-                                                class="text-[11px] font-bold text-red-500 uppercase tracking-widest mb-2 flex items-center gap-1">
-                                                <span class="material-symbols-outlined text-xs">cancel</span> Teks
-                                                Sebelumnya
-                                            </p>
+                                                class="text-[11px] font-bold text-red-500 uppercase tracking-widest mb-2">
+                                                Teks Sebelumnya</p>
                                             <p
-                                                class="text-sm text-gray-600 line-through decoration-red-300 leading-relaxed font-medium">
-                                                "{{ $riwayat->teks_lama ?? '' }}"
+                                                class="text-sm text-gray-600 line-through decoration-red-300 leading-relaxed">
+                                                "{{ $riwayat->teks_lama }}"
                                             </p>
                                         </div>
                                         <div
                                             class="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-500 shadow-sm">
                                             <p
-                                                class="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mb-2 flex items-center gap-1">
-                                                <span class="material-symbols-outlined text-xs">check_circle</span> Teks
-                                                Baru (Disahkan)
-                                            </p>
+                                                class="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mb-2">
+                                                Teks Baru (Disahkan)</p>
                                             <p class="text-lg text-emerald-900 font-bold leading-relaxed">
-                                                "{{ $riwayat->teks_baru ?? '' }}"
+                                                "{{ $riwayat->teks_baru }}"
                                             </p>
                                         </div>
                                     </div>
                                 </div>
 
+                                {{-- Alur Validasi --}}
                                 <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm space-y-5">
                                     <h4
                                         class="text-sm font-bold text-gray-800 flex items-center gap-1 border-b border-gray-100 pb-3">
@@ -302,47 +313,27 @@
                                         <div>
                                             <p class="text-[11px] font-bold text-gray-400 uppercase mb-1">1. Diusulkan
                                                 Oleh</p>
-                                            <div class="flex items-center gap-2">
-                                                <span
-                                                    class="material-symbols-outlined text-2xl text-gray-400">person_raised_hand</span>
-                                                <div>
-                                                    <p class="font-bold text-gray-900 text-sm">
-                                                        {{ $riwayat->usulan->nama_pengusul ?? 'Masyarakat' }}</p>
-                                                    <p class="text-xs text-gray-500">Warga Gorontalo</p>
-                                                </div>
-                                            </div>
+                                            <p class="font-bold text-gray-900 text-sm">
+                                                {{ $riwayat->usulan->nama_pengusul ?? 'Masyarakat' }}</p>
                                         </div>
                                         <div>
                                             <p class="text-[11px] font-bold text-gray-400 uppercase mb-1">2. Divalidasi
-                                                Oleh (Pakar)</p>
-                                            <div class="space-y-2">
-                                                @if (!empty($riwayat->usulan) && !empty($riwayat->usulan->assignments) && count($riwayat->usulan->assignments) > 0)
-                                                    @foreach ($riwayat->usulan->assignments as $assign)
-                                                        <div class="flex items-center gap-1">
-                                                            <span
-                                                                class="material-symbols-outlined text-emerald-500 text-sm">verified</span>
-                                                            <p class="font-bold text-gray-800 text-sm">
-                                                                {{ $assign->user->name ?? 'Pakar' }}</p>
-                                                        </div>
-                                                    @endforeach
-                                                @else
-                                                    <p class="text-xs text-gray-500 italic">Data pakar tidak tersedia.
-                                                    </p>
-                                                @endif
-                                            </div>
+                                                Oleh</p>
+                                            @forelse($riwayat->usulan->assignments ?? [] as $assign)
+                                                <p class="font-bold text-gray-800 text-sm flex items-center gap-1">
+                                                    <span
+                                                        class="material-symbols-outlined text-emerald-500 text-sm">verified</span>
+                                                    {{ $assign->user->name ?? 'Pakar' }}
+                                                </p>
+                                            @empty
+                                                <p class="text-xs text-gray-500 italic">Data pakar tidak tersedia</p>
+                                            @endforelse
                                         </div>
                                         <div>
                                             <p class="text-[11px] font-bold text-gray-400 uppercase mb-1">3.
-                                                Dipublikasikan Oleh (Editor)</p>
-                                            <div class="flex items-center gap-2">
-                                                <span
-                                                    class="material-symbols-outlined text-2xl text-blue-500">gavel</span>
-                                                <div>
-                                                    <p class="font-bold text-gray-900 text-sm">
-                                                        {{ $riwayat->editor->name ?? 'Sistem' }}</p>
-                                                    <p class="text-xs text-gray-500">Meja Redaksi</p>
-                                                </div>
-                                            </div>
+                                                Dipublikasikan Oleh</p>
+                                            <p class="font-bold text-gray-900 text-sm">
+                                                {{ $riwayat->editor->name ?? 'Editor' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -350,32 +341,87 @@
                                 @if (!empty($riwayat->alasan_revisi))
                                     <div>
                                         <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-                                            Catatan / Alasan Keputusan Pakar</h4>
+                                            Catatan / Alasan Keputusan</h4>
                                         <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                                            <p class="text-md text-yellow-900 leading-relaxed font-medium italic">
-                                                "{{ $riwayat->alasan_revisi }}"
-                                            </p>
+                                            <p class="text-md text-yellow-900 leading-relaxed italic">
+                                                "{{ $riwayat->alasan_revisi }}"</p>
                                         </div>
                                     </div>
                                 @endif
                             </div>
 
-                            <div class="p-4 bg-white border-t border-gray-200 shrink-0">
+                            <div class="p-4 bg-white border-t border-gray-200">
                                 <button onclick="tutupModalRiwayat({{ $riwayat->id }})"
-                                    class="w-full bg-gray-900 hover:bg-black text-white py-2 rounded-lg font-bold text-base shadow-md transition-all active:scale-[0.98]">
+                                    class="w-full bg-gray-900 hover:bg-black text-white py-2 rounded-lg font-bold">
                                     TUTUP LAPORAN INI
                                 </button>
                             </div>
                         </div>
                     </div>
                 @empty
+                    {{-- tidak ada perubahan teks --}}
+                @endforelse
+
+
+                {{-- B. KEPUTUSAN YANG DITOLAK (dari tabel usulan yang statusnya dipublikasi tapi tidak ada di riwayat) --}}
+                @foreach ($keputusan_validasi as $usulan)
+                    @php
+                        // Cek apakah usulan ini sudah punya riwayat (berarti diterima)
+                        $sudahAdaRiwayat = $riwayat_terjemahans->contains('usulan_id', $usulan->id);
+                    @endphp
+
+                    @if (!$sudahAdaRiwayat)
+                        {{-- Ini adalah usulan yang ditolak --}}
+                        <div
+                            class="group relative pl-6 sm:pl-10 border-l-4 border-red-400 transition-all duration-300 hover:border-red-500">
+                            <div
+                                class="absolute -left-[12px] top-0 w-5 h-5 rounded-full bg-white border-4 border-red-500 shadow-sm">
+                            </div>
+
+                            <div
+                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span
+                                            class="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded-full">DITOLAK</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-gray-900">
+                                        {{ $usulan->updated_at ? $usulan->updated_at->translatedFormat('d F Y') : '-' }}
+                                    </h3>
+                                    {{-- <p class="text-xs text-gray-500 font-medium">
+                                        Diusulkan oleh: <span
+                                            class="font-bold text-gray-700">{{ $usulan->nama_pengusul ?? 'Anonim' }}</span>
+                                    </p> --}}
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Usulan yang
+                                    ditolak:</p>
+                                <p class="text-lg text-gray-700 leading-relaxed italic mb-3">
+                                    "{{ $usulan->usulan_teks }}"
+                                </p>
+
+                                @if ($usulan->alasan_revisi)
+                                    <div class="bg-red-50 border border-red-100 rounded-lg p-3">
+                                        <p class="text-xs font-bold text-red-600 uppercase mb-1">Alasan Penolakan:</p>
+                                        <p class="text-sm text-red-800">{{ $usulan->alasan_revisi }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+
+
+                {{-- Jika sama sekali tidak ada data --}}
+                @if ($riwayat_terjemahans->isEmpty() && $keputusan_validasi->where('status', 'dipublikasi')->isEmpty())
                     <div class="text-center py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
                         <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">history_off</span>
-                        <h3 class="text-xl font-bold text-gray-700 mb-1">Belum Ada Riwayat Perubahan</h3>
-                        <p class="text-md text-gray-500">Terjemahan ayat ini masih menggunakan versi asli dan belum
-                            pernah direvisi.</p>
+                        <h3 class="text-xl font-bold text-gray-700 mb-1">Belum Ada Riwayat</h3>
+                        <p class="text-md text-gray-500">Belum ada validasi yang dipublikasikan untuk ayat ini.</p>
                     </div>
-                @endforelse
+                @endif
             </div>
         </section>
 
@@ -390,7 +436,7 @@
             </div>
 
             <form action="{{ route('usulan.store') }}" method="POST"
-                class="space-y-6 max-w-4xl bg-white p-6 sm:p-7 rounded-xl shadow-sm border border-gray-200 relative overflow-hidden">
+                class="space-y-6  bg-white p-6 sm:p-7 rounded-xl shadow-sm border border-gray-200 relative overflow-hidden">
                 @csrf
                 <input type="hidden" name="ayat_id" value="{{ $data_ayat->id ?? '' }}">
 
@@ -464,7 +510,7 @@
                     <span class="material-symbols-outlined text-2xl transform -rotate-12">send</span>
                     KIRIM USULAN SEKARANG
                 </button>
-        </form>
+            </form>
         </section>
 
     </div>

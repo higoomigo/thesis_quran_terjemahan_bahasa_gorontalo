@@ -27,6 +27,8 @@ class ProfileController extends Controller
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
+
+
     }
 
     /**
@@ -34,6 +36,8 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+
+        // dd($request->all());
         $user = $request->user();
 
         // Menyimpan data name, email, dan bio
@@ -64,10 +68,20 @@ class ProfileController extends Controller
             $path = $request->file('avatar')->store('avatars', 'public');
             $user->avatar = $path;
         }
+        $user->no_hp = $request->input('no_hp'); // Simpan nomor HP
+        $user->bio = $request->input('bio'); // Simpan bio
 
-        $user->save();
+       $saved = $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+       return redirect()
+        ->route('profile.edit')
+        ->with(
+            $saved ? 'success' : 'error',
+            $saved
+                ? 'Profil berhasil disimpan!'
+                : 'Gagal menyimpan profil.'
+        );
+        // return Redirect::route('profile.edit')->with('message', 'Profil berhasil diperbarui.');
     }
 
     /**

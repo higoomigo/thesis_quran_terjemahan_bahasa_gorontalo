@@ -10,6 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
+    @include('partials.pwa')
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -55,9 +56,36 @@
             }
         }
     </script>
+
+    <!-- Add CSS ini di dalam <head> -->
+    <style>
+        #loading-screen {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #loading-screen.hidden-loader {
+            opacity: 0;
+            visibility: hidden;
+        }
+    </style>
 </head>
 
 <body class="bg-surface text-slate-900 font-sans min-h-screen flex flex-col antialiased">
+
+    <div id="loading-screen" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#f9f9ff]">
+        <div class="relative flex items-center justify-center">
+            <!-- Spinner Outer Ring -->
+            <div class="w-16 h-16 border-4 border-emerald-200 border-t-emerald-900 rounded-full animate-spin"></div>
+            <!-- Icon Al-Qur'an di Tengah -->
+            
+        </div>
+        <!-- Teks Khas Bahasa Gorontalo / Indonesia -->
+        <p class="mt-4 text-xs md:text-sm font-bold text-slate-600 tracking-wider uppercase animate-pulse">
+            Sabaripo...
+        </p>
+    </div>
+
     <!-- TopNavBar -->
     @include('partials.navbar')
 
@@ -328,6 +356,126 @@
         </a>
     </nav> --}}
     <div class="h-24 md:hidden"></div>
+
+    <x-toaster />
+
+    <script>
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loading-screen');
+            if (loader) {
+                // Tambahkan efek fade-out
+                loader.classList.add('hidden-loader');
+
+                // Hilangkan dari DOM total setelah transisi 400ms selesai
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 400);
+            }
+        });
+    </script>
+
+    {{-- Floating Install Bubble --}}
+<div id="pwaInstallWrap" class="hidden fixed bottom-5 right-5 z-[9999]">
+    <button id="btnInstallPwa"
+        class="flex items-center gap-2 rounded-full bg-emerald-700 text-white shadow-lg px-4 py-3 hover:bg-emerald-800 transition"
+        title="Install aplikasi">
+        <span class="material-symbols-outlined text-[22px]">download</span>
+        <span class="text-sm font-medium pr-1">Install App</span>
+    </button>
+</div>
+
+{{-- Modal konfirmasi install --}}
+<div id="pwaInstallModal"
+     class="hidden fixed inset-0 z-[10000] bg-black/40 flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 shadow-xl">
+        <div class="flex items-start gap-3">
+            <img src="{{ asset('icons/icon-192.png') }}" alt="App Icon"
+                 class="w-12 h-12 rounded-xl border border-gray-100">
+            <div>
+                <h3 class="text-base font-semibold text-gray-900">Install Qur'an Hulontalo</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                    Pasang aplikasi untuk akses lebih cepat ke landing page dan baca naskah Al-Qur'an terjemahan Gorontalo.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-5 flex gap-2 justify-end">
+            <button id="pwaInstallCancel"
+                class="px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition">
+                Nanti saja
+            </button>
+            <button id="pwaInstallConfirm"
+                class="px-4 py-2 rounded-lg text-sm bg-emerald-700 text-white hover:bg-emerald-800 transition">
+                Install
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(() => {
+    let deferredPrompt = null;
+
+    const wrap = document.getElementById('pwaInstallWrap');
+    const btn = document.getElementById('btnInstallPwa');
+    const modal = document.getElementById('pwaInstallModal');
+    const btnCancel = document.getElementById('pwaInstallCancel');
+    const btnConfirm = document.getElementById('pwaInstallConfirm');
+
+    function showBubble() {
+        wrap?.classList.remove('hidden');
+    }
+
+    function hideBubble() {
+        wrap?.classList.add('hidden');
+    }
+
+    function openModal() {
+        modal?.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal?.classList.add('hidden');
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showBubble();
+    });
+
+    btn?.addEventListener('click', () => {
+        if (!deferredPrompt) return;
+        openModal();
+    });
+
+    btnCancel?.addEventListener('click', closeModal);
+
+    btnConfirm?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+
+        closeModal();
+        deferredPrompt.prompt();
+
+        const result = await deferredPrompt.userChoice;
+        console.log('PWA install:', result.outcome);
+
+        deferredPrompt = null;
+        hideBubble();
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        hideBubble();
+        closeModal();
+    });
+
+    // klik luar modal = tutup
+    modal?.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+})();
+</script>
 </body>
 
 </html>

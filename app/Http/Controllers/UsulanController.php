@@ -19,30 +19,45 @@ class UsulanController extends Controller
     /**
      * Menampilkan halaman usulan untuk ayat tertentu
      */
-   public function index($surah_id, $ayat_id)
+    public function index($surah_id, $ayat_id)
     {
-        // 1. CARI BERDASARKAN no_surah, BUKAN id
+        // 1. Cari Surah
         $data_surah = Surah::where('no_surah', $surah_id)->firstOrFail();
 
-        // 2. CARI AYAT BERDASARKAN nomorAyat DAN surah_id
+        // 2. Cari Ayat
         $data_ayat = Ayat::with(['usulan' => function ($query) {
             $query->where('status', '!=', 'dipublikasi')->latest();
         }])
-        ->where('no_surah', $data_surah->no_surah) // CATATAN: Kalau foreign key lu di tabel ayat namanya no_surah, ubah jadi $data_surah->no_surah
-        ->where('nomorAyat', $ayat_id)
-        ->firstOrFail();
+            ->where('no_surah', $data_surah->no_surah)
+            ->where('nomorAyat', $ayat_id)
+            ->firstOrFail();
 
-        // 3. AMBIL RIWAYAT BERDASARKAN ayat_id
+        // 3. Riwayat perubahan teks (hanya yang benar-benar diubah)
         $riwayat_terjemahans = RiwayatTerjemahan::with([
             'editor:id,name',
             'usulan',
             'usulan.assignments.user:id,name'
         ])
-        ->where('ayat_id', $data_ayat->id)
-        ->latest()
-        ->get();
+            ->where('ayat_id', $data_ayat->id)
+            ->latest()
+            ->get();
 
-        return view('usulan_guest.index', compact('data_surah', 'data_ayat', 'riwayat_terjemahans'));
+        // 4. Semua keputusan validasi yang sudah dipublikasi (diterima + ditolak)
+        $keputusan_validasi = Usulan::with([
+            'assignments.user:id,name',
+            // 'editor:id,name' // kalau ada relasi editor
+        ])
+            ->where('ayat_id', $data_ayat->id)
+            ->where('status', 'dipublikasi')
+            ->latest()
+            ->get();
+
+        return view('usulan_guest.index', compact(
+            'data_surah',
+            'data_ayat',
+            'riwayat_terjemahans',
+            'keputusan_validasi'
+        ));
     }
     /**
      * Menyimpan usulan terjemahan baru
@@ -73,7 +88,7 @@ class UsulanController extends Controller
                 'nama_pengusul' => $validated['nama_pengusul'],
                 'no_hp' => $validated['no_hp'],
                 'usulan_teks' => $validated['usulan_teks'],
-                'status' => '',
+                'status' => 'menunggu',
             ]);
 
             DB::commit();
@@ -97,6 +112,4 @@ class UsulanController extends Controller
                 ->with('error', 'Maaf, terjadi kesalahan sistem. Silakan coba lagi nanti.');
         }
     }
-
-    
 }

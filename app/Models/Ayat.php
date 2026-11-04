@@ -11,22 +11,17 @@ class Ayat extends Model
     protected $table = 'ayats';
     
     protected $fillable = [
-        'teks_gorontalo' // Hanya ini yang boleh diubah
-    ];
-    
-    protected $guarded = [
-        'id',
         'no_surah',
         'nomorAyat',
+        'juz',
         'Arab',
         'teksIndo',
-        'created_at',
-        'updated_at'
+        'teks_gorontalo',
     ];
-    
+
     protected $casts = [
-        'no_surah' => 'integer',
-        'nomorAyat' => 'integer',
+        'no_surah'   => 'integer',
+        'nomorAyat'  => 'integer',
     ];
     
     // Relasi ke usulan terjemahan
@@ -40,15 +35,20 @@ class Ayat extends Model
     {
         return $this->belongsTo(Surah::class, 'no_surah', 'no_surah');
     }
-    
+
+    public function audioArabs()
+    {
+        return $this->hasMany(AudioArab::class);
+    }
+
+    public function audioGorontalos()
+    {
+        return $this->hasMany(AudioGorontalo::class);
+    }
+
     // Accessor untuk nomor ayat yang diformat
     public function getNomorAyatFormattedAttribute(): string
     {
         return "{$this->no_surah}:{$this->nomorAyat}";
-    }
-
-    public function ayatAudios()
-    {
-        return $this->hasMany(AyatAudio::class, 'ayat_id');
     }
 }

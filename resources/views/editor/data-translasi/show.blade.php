@@ -36,11 +36,11 @@
                 <h2 class="text-3xl font-black text-gray-800">QS. {{ $surah->nama_latin }}</h2>
                 <p class="text-gray-500 mt-1 font-medium mb-4">{{ $surah->arti }} • {{ count($ayats) }} Ayat</p>
                 
-                <form action="{{ route('editor.data-terjemahan.import', $surah->no_surah) }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                <form action="{{ route('editor.data-terjemahan.storeCsv', $surah->no_surah) }}" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
                     @csrf
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-emerald-600">upload_file</span>
-                        <input type="file" name="file_excel" accept=".xlsx, .xls, .csv" required
+                        <input type="file" name="file_csv" accept=".xlsx, .xls, .csv" required
                             class="text-sm text-gray-600 
                             file:mr-3 file:py-2 file:px-4 
                             file:rounded-lg file:border-0 
@@ -54,9 +54,9 @@
                 </form>
             </div>
             
-            <div class="bg-emerald-50 px-5 py-3 rounded-xl border border-emerald-100 text-center hidden md:block">
+            {{-- <div class="bg-emerald-50 px-5 py-3 rounded-xl border border-emerald-100 text-center hidden md:block">
                 <span class="block text-2xl font-black text-emerald-700">{{ $surah->arabic_name ?? 'Arabic' }}</span>
-            </div>
+            </div> --}}
         </div>
     </header>
 
@@ -64,7 +64,7 @@
         
         @if($surah->no_surah != 1 && $surah->no_surah != 9)
             <div class="text-center py-6">
-                <p class="arabic-text !text-4xl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+                <p class="arabic-text text-4xl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
             </div>
         @endif
 
@@ -72,13 +72,13 @@
             <div id="ayat-{{ $ayat->nomorAyat }}" class="scroll-mt-24">
                 <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     
-                    <div class="p-6 sm:p-8 bg-gray-50/50 border-b border-gray-100">
+                    <div class="p-2 sm:p-8 bg-gray-50/50 border-b border-gray-100">
                         <div class="flex items-start justify-between gap-4 mb-4">
                             <span class="inline-flex items-center justify-center min-w-[3rem] px-3 py-1 bg-emerald-100 text-emerald-800 font-bold text-sm rounded-lg border border-emerald-200">
                                 Ayat {{ $ayat->nomorAyat }}
                             </span>
                         </div>
-                        <p class="arabic-text">
+                        <p class="arabic-text justify-end ">
                             {{ $ayat->Arab }}
                         </p>
                     </div>

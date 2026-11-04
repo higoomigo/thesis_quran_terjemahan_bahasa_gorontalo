@@ -29,6 +29,7 @@ class ProfileUpdateRequest extends FormRequest
             // Aturan validasi tambahan untuk forum
             'bio' => ['nullable', 'string', 'max:1000'],
             'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'no_hp' => ['required', 'regex:/^[0-9]+$/', 'digits_between:10,15'],
         ];
     }
 }

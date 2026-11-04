@@ -146,7 +146,8 @@ class ValidasiChatController extends Controller
         $chat = UsulanChat::create([
             'usulan_id' => $id,
             'user_id' => Auth::id(),
-            'pesan' => '🗳️ **Sesi pemungutan suara telah dimulai**\n\nSilakan pilih keputusan Anda: "Setuju" atau "Tolak" pada card di bawah ini.',
+            'pesan' => '🗳️ **Sesi pemungutan suara telah dimulai**\n\n
+            Silakan pilih keputusan Anda: "Setuju" atau "Tolak" pada card di bawah ini.',
             'is_system_message' => true
         ]);
 
@@ -179,8 +180,8 @@ class ValidasiChatController extends Controller
             return response()->json(['error' => 'Unauthorized. Anda bukan validator di usulan ini.'], 403);
         }
 
-        // Cek apakah status masih 'menunggu'
-        if ($usulan->status !== 'menunggu') {
+        // Cek apakah status masih 'menunggu_validasi'
+        if ($usulan->status !== 'menunggu_validasi') {
             return response()->json(['error' => 'Sesi voting untuk usulan ini sudah ditutup.'], 400);
         }
 
@@ -195,25 +196,26 @@ class ValidasiChatController extends Controller
             return response()->json(['error' => 'Anda sudah memberikan suara.'], 400);
         }
 
-        // 2. Kunci dengan Database Transaction (Mencegah Race Condition / Bentrok)
+        // 2. Kunci dengan Database Transaction
         DB::beginTransaction();
         try {
             // Simpan vote
             $vote = UsulanVote::create([
                 'usulan_id' => $id,
-                'user_id' => Auth::id(),
+                'user_id'   => Auth::id(),
                 'keputusan' => $request->keputusan
             ]);
 
             // Kirim pesan sistem bahwa user ini baru saja voting
             $voteMessage = UsulanChat::create([
-                'usulan_id' => $id,
-                'user_id' => Auth::id(),
-                'pesan' => "📊 **" . Auth::user()->name . "** memberikan suara: **" . strtoupper($request->keputusan) . "**",
+                'usulan_id'         => $id,
+                'user_id'           => Auth::id(),
+                'pesan'             => "📊 **" . Auth::user()->name . "** memberikan suara: **" . 
+                strtoupper($request->keputusan) . "**",
                 'is_system_message' => true
             ]);
 
-            // 3. Hitung Ulang Votes Langsung dari DB (Paling Akurat)
+            // 3. Hitung Ulang Votes Langsung dari DB
             $setujuCount = UsulanVote::where('usulan_id', $id)->where('keputusan', 'setuju')->count();
             $tolakCount  = UsulanVote::where('usulan_id', $id)->where('keputusan', 'tolak')->count();
             $totalVotes  = $setujuCount + $tolakCount;
@@ -224,56 +226,76 @@ class ValidasiChatController extends Controller
                 'total'  => $totalVotes
             ];
 
-            $votingComplete = $totalVotes >= 3;
+            // --- LOGIKA HAK VETO ---
+            $votingComplete = false;
+            $finalDecision  = null;
+
+            if ($tolakCount > 0) {
+                // HAK VETO: Cukup 1 suara TOLAK, sesi voting LANGSUNG SELESAI & DITOLAK
+                $votingComplete = true;
+                $finalDecision  = 'ditolak';
+            } elseif ($setujuCount >= 3) {
+                // Kuota setuju terpenuhi (3 suara setuju tanpa ada yang menolak)
+                $votingComplete = true;
+                $finalDecision  = 'diterima';
+            }
+
             $result = null;
 
-            // 4. JIKA VOTING SELESAI (SUARA KE-3 MASUK) -> UPDATE TABEL USULAN_TERJEMAHANS
+            // 4. JIKA VOTING SELESAI (Hak Veto Aktif / 3 Setuju) -> UPDATE TABEL USULAN
             if ($votingComplete) {
-                $finalDecision = ($setujuCount >= 2) ? 'diterima' : 'ditolak';
-
-                // ---> INI EKSEKUSI UPDATE KE TABEL USULAN_TERJEMAHANS <---
-                $usulan->status = $finalDecision;
-                $usulan->validated_at = now(); // Ngisi kolom yang barusan kita migrate
+                $usulan->status       = $finalDecision;
+                $usulan->validated_at = now();
                 $usulan->save();
 
-                // (Opsional) Update status di tabel usulan_assignments menjadi 'selesai'
+                // Update status tugas validator menjadi selesai
                 $usulan->assignments()->update(['status' => 'selesai']);
 
-                // Kirim pesan sistem hasil akhir
-                $resultMessage = $finalDecision == 'diterima'
-                    ? "🎉 **KEPUTUSAN FINAL: USULAN DITERIMA** 🎉\n\nMayoritas suara ($setujuCount dari 3) menyetujui usulan ini. Menunggu proses selanjutnya di Meja Editor."
-                    : "📌 **KEPUTUSAN FINAL: USULAN DITOLAK** 📌\n\nMayoritas suara ($tolakCount dari 3) menolak usulan ini. Usulan diarsipkan.";
+                // Pesan sistem sesuai hasil
+                if ($finalDecision === 'ditolak') {
+                    $resultMessage = "📌 **KEPUTUSAN FINAL: USULAN DITOLAK (HAK VETO)** 📌\n\n
+                    Sesi voting dihentikan karena terdapat validator yang
+                    memberikan suara **TOLAK**. Usulan resmi diarsipkan.";
+                } else {
+                    $resultMessage = "🎉 **KEPUTUSAN FINAL: USULAN DITERIMA** 🎉\n\n
+                    Seluruh validator ($setujuCount dari 3) 
+                    menyetujui usulan ini. Menunggu proses selanjutnya 
+                    di Meja Editor.";
+                }
 
                 UsulanChat::create([
-                    'usulan_id' => $id,
-                    'user_id' => Auth::id(),
-                    'pesan' => $resultMessage,
+                    'usulan_id'         => $id,
+                    'user_id'           => Auth::id(),
+                    'pesan'             => $resultMessage,
                     'is_system_message' => true
                 ]);
 
                 $result = [
                     'final_decision' => $finalDecision,
-                    'vote_counts' => $voteCounts
+                    'vote_counts'    => $voteCounts
                 ];
             }
 
-            DB::commit(); // Simpan semua perubahan ke database
+            DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Suara berhasil disimpan',
-                'vote_counts' => $voteCounts,
+                'success'         => true,
+                'message'         => 'Suara berhasil disimpan',
+                'vote_counts'     => $voteCounts,
                 'voting_complete' => $votingComplete,
-                'result' => $result,
-                'vote_message' => [
-                    'id' => $voteMessage->id,
-                    'pesan' => $voteMessage->pesan,
+                'result'          => $result,
+                'vote_message'    => [
+                    'id'         => $voteMessage->id,
+                    'pesan'      => $voteMessage->pesan,
                     'created_at' => $voteMessage->created_at->diffForHumans()
                 ]
             ]);
+
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan semua aksi jika terjadi error
-            return response()->json(['error' => 'Terjadi kesalahan sistem saat menyimpan suara: ' . $e->getMessage()], 500);
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Terjadi kesalahan sistem saat menyimpan suara: ' . $e->getMessage()
+            ], 500);
         }
     }
 

@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\UsulanController;
 use Illuminate\Support\Facades\Route;
 
 // Nanti kalau controllernya udah lu bikin, tinggal di-uncomment
-use App\Http\Controllers\Editor\AudioController;
+// use App\Http\Controllers\Editor\AudioController;
 use App\Http\Controllers\Editor\DashboardController;
 use App\Http\Controllers\Editor\AntreanController;
 use App\Http\Controllers\Editor\AudioAyatController;
@@ -18,7 +18,7 @@ use App\Http\Controllers\Editor\RiwayatController;
 // use App\Http\Controllers\Editor\RiwayatController;
 
 // Group route dengan middleware auth dan prefix editor
-Route::prefix('editor')->name('editor.')->middleware(['auth'])->group(function () {
+Route::prefix('editor')->name('editor.')->middleware(['auth', 'role:admin,editor'])->group(function () {
     
     // 1. Dashboard Editor
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -56,7 +56,7 @@ Route::prefix('editor')->name('editor.')->middleware(['auth'])->group(function (
         Route::get('/', [DataTranslasi::class, 'index'])->name('index');
         Route::get('/{id}', [DataTranslasi::class, 'show'])->name('show');
         Route::put('/{id}/update', [DataTranslasi::class, 'updateAyat'])->name('update');
-        Route::post('/{no_surah}/import', [DataTranslasi::class, 'importExcel'])->name('import');
+        Route::post('/{no_surah}/import', [DataTranslasi::class, 'storeCsv'])->name('storeCsv');
     });
 
     // Route Manajemen Audio

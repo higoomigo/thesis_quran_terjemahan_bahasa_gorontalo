@@ -8,14 +8,26 @@ use App\Http\Controllers\Admin\ValidasiController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 // use App\Http\Controllers\Admin\RiwayatController;\
 use App\Http\Controllers\Admin\ValidasiChatController;
-use App\Http\Controllers\Backend\AudioController;
+// use App\Http\Controllers\Backend\AudioController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\UserManagementController; 
 
 // use App\Http\Controllers\Admin\AuthController;
 
 
 // Group route dengan middleware auth dan prefix admin
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,teologi,linguistik,editor'])->group(function () {
+
+    Route::prefix('user')->name('user.')->group(function () {
+        Route::get('/', [UserManagementController::class, 'index'])->name('index');
+        Route::get('/create', [UserManagementController::class, 'create'])->name('create');
+        Route::post('/', [UserManagementController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [UserManagementController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UserManagementController::class, 'update'])->name('update');
+        Route::patch('/{id}/role', [UserManagementController::class, 'updateRole'])->name('role'); // buat ganti role cepat
+        Route::delete('/{id}', [UserManagementController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}', [UserManagementController::class, 'show'])->name('show');
+    });
 
     // Dashboard
     // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -26,7 +38,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::get('/{id}', [UsulanController::class, 'show'])->name('show');
         Route::delete('/{id}', [UsulanController::class, 'destroy'])->name('destroy');
         Route::patch('/{id}/status', [UsulanController::class, 'updateStatus'])->name('status');
-     
+        Route::post('/{id}/claim', [UsulanController::class, 'claim'])->name('claim');
     });
 
     Route::get('/profil', [ProfileController::class, 'adminProfile'])->name('profile.show');

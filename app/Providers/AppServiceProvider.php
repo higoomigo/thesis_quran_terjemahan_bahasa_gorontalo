@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,9 @@ class AppServiceProvider extends ServiceProvider
         
         // Mengubah locale sistem PHP (opsional, untuk fungsi native date())
         setlocale(LC_TIME, 'id_ID.UTF-8'); 
+
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
     }
 }

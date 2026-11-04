@@ -8,7 +8,7 @@
         @elseif (Auth::user()->role === 'teologi' || Auth::user()->role === 'linguistik')
             <h1 class="text-lg font-black text-emerald-800 text-xl">Validator Panel</h1>
         @endif
-        <p class="text-gray-500 text-xs">Gorontalo Translation</p>
+        <p class="text-gray-500 text-xs">Terjemahan Gorontalo</p>
     </div>
 
     <!-- Scrollable Nav Area biar kalau menunya panjang nggak kepotong layar bawah -->

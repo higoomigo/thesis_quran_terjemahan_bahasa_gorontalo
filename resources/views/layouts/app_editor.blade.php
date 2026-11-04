@@ -23,9 +23,17 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
-        .arabic-font {
+        .arabic-text {
             font-family: 'Noto Serif', serif;
+            font-size: 42px;
+            /* Ukuran pas untuk fokus */
+            line-height: 2.2;
+            direction: rtl;
+            text-align: right;
+            color: #064e3b;
         }
+
+        
 
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -62,9 +70,9 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
         
-        .arabic-font {
+        /* .arabic-font {
             font-family: 'Noto Serif', serif;
-        }
+        } */
         
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -104,7 +112,9 @@
             @include('partials.sidebar')
         @endif
 
-        
-                @yield('content')
+
+        @yield('content')
+
+        <x-toaster />
     </body>
 </html>

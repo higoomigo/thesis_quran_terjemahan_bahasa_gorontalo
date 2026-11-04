@@ -57,66 +57,64 @@ class AntreanController extends Controller
      */
     public function publikasi(Request $request, $id)
     {
-        // 1. Validasi input dari form textarea Editor
-        $request->validate([
-            'teks_final' => 'required|string',
-        ]);
-
         try {
-            // Gunakan Transaction agar jika salah satu gagal, semua dibatalkan (anti-data-korup)
             DB::beginTransaction();
 
             $usulan = Usulan::findOrFail($id);
-
-            // Keamanan lapis kedua: pastikan usulan memang berstatus 'diterima'
-
-
-            $ayat = Ayat::findOrFail($usulan->ayat_id);
+            $ayat   = Ayat::findOrFail($usulan->ayat_id);
 
             // ==========================================
-            // INI YANG HILANG BANG: ARSIPKAN KE BRANKAS SEJARAH
+            // 1. VALIDASI BERDASARKAN STATUS
             // ==========================================
-            RiwayatTerjemahan::create([
-                'ayat_id'       => $ayat->id,
-                'usulan_id'     => $usulan->id,
-                'editor_id'     => auth()->id(), // Mencatat Editor siapa yang ngetuk palu
-                'teks_lama'     => $ayat->teks_gorontalo, // Teks asli Gorontalo sebelum ditimpa
-                'teks_baru'     => $request->teks_final,  // Teks final dari editor
-                'alasan_revisi' => $usulan->alasan_revisi, // Ngunci alasan dari dewan pakar
-            ]);
-
-            // ==========================================
-            // 2. UPDATE DATA UTAMA AL-QUR'AN
-            // ==========================================
-            $ayat->update([
-                'teks_gorontalo' => $request->teks_final
-            ]);
-
-            // ==========================================
-            // 3. TUTUP BUKU USULAN
-            // ==========================================
-            if ($usulan->status !== 'ditolak') {
-                $usulan->update([
-                    'status' => 'dipublikasi',
-                    // Kita nggak menimpa usulan_teks biar sejarah ketikan asli masyarakat tetap utuh
+            if ($usulan->status === 'diterima') {
+                $request->validate([
+                    'teks_final'    => 'required|string',
+                    'alasan_revisi' => 'required|string',
+                ]);
+            } else {
+                // Kalau ditolak, teks_final tidak wajib
+                $request->validate([
+                    'alasan_revisi' => 'required|string',
                 ]);
             }
+
+            // ==========================================
+            // 2. JIKA DITERIMA → UPDATE TERJEMAHAN + RIWAYAT
+            // ==========================================
+            if ($usulan->status === 'diterima') {
+                // Simpan riwayat sebelum ditimpa
+                RiwayatTerjemahan::create([
+                    'ayat_id'       => $ayat->id,
+                    'usulan_id'     => $usulan->id,
+                    'editor_id'     => auth()->id(),
+                    'teks_lama'     => $ayat->teks_gorontalo,
+                    'teks_baru'     => $request->teks_final,
+                    'alasan_revisi' => $request->alasan_revisi,
+                ]);
+
+                // Update teks utama
+                $ayat->update([
+                    'teks_gorontalo' => $request->teks_final
+                ]);
+            }
+
+            // ==========================================
+            // 3. SELALU UPDATE STATUS JADI DIPUBLIKASI
+            //    (baik diterima maupun ditolak)
+            // ==========================================
             $usulan->update([
-                'status' => 'dipublikasi',
-                // Kita nggak menimpa usulan_teks biar sejarah ketikan asli masyarakat tetap utuh
+                'status'        => 'dipublikasi',
+                'alasan_revisi' => $request->alasan_revisi, // simpan alasan dari form
             ]);
 
-            DB::commit(); // Simpan semua perubahan permanen ke database
+            DB::commit();
 
             return redirect()->route('editor.antrean.index')
-                ->with('success', 'Alhamdulillah! Terjemahan berhasil dipublikasi dan riwayat telah diarsipkan.');
+                ->with('success', 'Alhamdulillah! Hasil validasi berhasil dipublikasikan.');
+                
         } catch (\Exception $e) {
             DB::rollBack();
-            // MATIKAN KODE BAWAH SEMENTARA
             return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
-
-            // NYALAKAN X-RAY:
-            // dd('ERRORNYA DI SINI BLAY:', $e->getMessage(), 'Di Baris:', $e->getLine());
         }
     }
 }

@@ -230,7 +230,7 @@
                                         <span class="material-symbols-outlined text-xl">visibility</span>
                                     </button>
 
-                                    @auth
+                                    {{-- @auth
                                         @if (in_array(Auth::user()->role, ['admin', 'editor']))
                                             <div class="w-px h-6 bg-gray-200 mx-1"></div>
 
@@ -258,7 +258,7 @@
                                                 </button>
                                             </form>
                                         @endif
-                                    @endauth
+                                    @endauth --}}
 
                                 </div>
                             </td>
@@ -526,6 +526,11 @@
                         
                         ${data.ayat?.teks_gorontalo ? `<p class="arabic-font text-right text-md mt-2">${escapeHtml(data.ayat.teks_gorontalo)}</p>` : ''}
                     </div>
+
+                    <div>
+                        <p class="text-xs text-gray-500 mb-1">Usulan Terjemahan (Hulontalo)</p>
+                        <p class="bg-yellow-50 p-3 rounded-lg italic">"${escapeHtml(data.usulan_teks)}"</p>
+                    </div>
                     
                     <div>
                         <p class="text-xs text-gray-500 mb-1">Pengusul</p>
@@ -535,10 +540,7 @@
 
                     ${validatorHtml}
                     
-                    <div>
-                        <p class="text-xs text-gray-500 mb-1">Usulan Terjemahan (Hulontalo)</p>
-                        <p class="bg-yellow-50 p-3 rounded-lg italic">"${escapeHtml(data.usulan_teks)}"</p>
-                    </div>
+                    
                     
                     ${data.alasan_usulan ? `
                                 <div>
@@ -646,7 +648,7 @@
         function getStatusText(status) {
             switch (status) {
                 case 'menunggu_validasi':
-                    return 'Menunggu_validasi';
+                    return 'Menunggu Validasi';
                 case 'diterima':
                     return 'Diterima';
                 case 'ditolak':

@@ -31,7 +31,41 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-6">
+                <!-- TAMPIL HANYA JIKA STATUS SUDAH FINAL (DITERIMA / DITOLAK) -->
+    @if(in_array($usulan->status, ['diterima', 'ditolak']))
+        <div class="bg-white rounded-xl border {{ $usulan->status == 'diterima' ? 'border-emerald-200' : 'border-red-200' }} shadow-sm overflow-hidden">
+            
+            <!-- HEADER BERDASARKAN STATUS -->
+            <div class="px-6 py-4 flex items-center justify-between border-b {{ $usulan->status == 'diterima' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100' }}">
+                <h3 class="font-bold {{ $usulan->status == 'diterima' ? 'text-emerald-800' : 'text-red-800' }}">
+                    <span class="material-symbols-outlined align-middle mr-1 text-[20px]">
+                        {{ $usulan->status == 'diterima' ? 'check_circle' : 'cancel' }}
+                    </span>
+                    Hasil Keputusan Validator
+                </h3>
                 
+                <!-- BADGE STATUS -->
+                <span class="px-3 py-1 text-xs font-bold rounded-full {{ $usulan->status == 'diterima' ? 'bg-emerald-200 text-emerald-900' : 'bg-red-200 text-red-900' }}">
+                    {{ strtoupper($usulan->status) }}
+                </span>
+            </div>
+
+            <!-- BODY PENJELASAN -->
+            <div class="p-6 bg-white">
+                @if($usulan->status == 'diterima')
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        🎉 Usulan ini telah <strong>disetujui</strong> oleh para validator. Selanjutnya usulan akan diteruskan ke Meja Editor untuk diproses lebih lanjut.
+                    </p>
+                @elseif($usulan->status == 'ditolak')
+                    <p class="text-sm text-slate-700 leading-relaxed">
+                        📌 Usulan ini <strong>ditolak (terkena Hak Veto)</strong> oleh validator. Sesi voting telah dihentikan dan usulan resmi diarsipkan.
+                    </p>
+                @endif
+            </div>
+
+        </div>
+    @endif
+
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                     <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
                         <h3 class="font-bold text-gray-800">Detail Konteks Usulan</h3>
@@ -77,6 +111,7 @@
                         <h3 class="font-bold">Hasil Keputusan & Catatan Dewan Pakar</h3>
                     </div>
                     <div class="p-6 space-y-4">
+                        
                         <div>
                             <p class="text-xs text-blue-600 uppercase tracking-wider font-bold mb-1">Pesan Internal Untuk Editor :</p>
                             <div class="bg-blue-50/50 p-4 rounded-lg border border-blue-100 text-sm text-blue-900 font-medium">
@@ -84,17 +119,25 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Alasan Revisi (Akan Dilihat Publik) :</p>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">
+                                @if($usulan->status == 'diterima') 
+                                    Alasan Revisi (Akan Dilihat Publik) :
+                                @else
+                                    Alasan Penolakan (Akan Dilihat Publik) :
+                                @endif
+                            </p>
                             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-sm text-gray-700">
                                 "{{ $usulan->alasan_revisi ?? 'Tidak ada alasan khusus yang dicantumkan.' }}"
                             </div>
                         </div>
+                        @if($usulan->status == 'diterima')
                         <div>
                             <p class="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Teks Translasi Terbaru</p>
                             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-sm text-gray-700">
                                 "{{ $usulan->teks_rekomendasi ?? 'Tidak ada rekomendasi khusus yang dicantumkan.' }}"
                             </div>
                         </div>
+                        @endif
                     </div>
                 </div>
 
@@ -103,7 +146,7 @@
                     <div class="px-6 py-4 bg-emerald-50 border-b border-emerald-200">
                         <h3 class="font-bold text-emerald-800 flex items-center gap-2">
                             <span class="material-symbols-outlined">publish</span>
-                            Penerbitan Resmi Terjemahan
+                            Penerbitan Resmi Hasil Validasi
                         </h3>
                     </div>
 
@@ -135,19 +178,41 @@
                              BAGIAN 2: EKSEKUSI (AFTER)
                              ========================================== --}}
                         <div class="p-6">
+                            <div class="mb-6">
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Usulan Awal (Dari Masyarakat)</p>
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                    <p class="italic text-gray-700">"{{ $usulan->usulan_teks }}"</p>
+                                </div>
+                            </div>
+                            
+                             @if($usulan->status == 'diterima') 
                             <div class="mb-4">
                                 <label class="block text-sm font-bold text-gray-700 mb-2 flex justify-between items-end">
                                     <span>Teks Final Bahasa Gorontalo <span class="text-red-500">*</span></span>
-                                    <span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">Berdasarkan Rumusan Pakar</span>
+                                    <span class="text-xs text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100">Berdasarkan Rumusan Pakar</span>
                                 </label>
                                 
                                 {{-- MODIFIKASI: Mengambil data teks_rekomendasi milik pakar secara otomatis --}}
-                                <textarea name="teks_final" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors text-lg font-medium bg-white shadow-inner" placeholder="Tuliskan teks terjemahan final...">{{ old('teks_final', $usulan->teks_rekomendasi ?? $usulan->usulan_teks) }}</textarea>
+                                <textarea name="teks_final" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors text-lg font-medium bg-white shadow-inner" placeholder="Tuliskan teks terjemahan final...">{{ old('teks_final', $usulan->ayat->teks_gorontalo) }}</textarea>
                                 
                                 <p class="text-xs text-gray-500 mt-2 flex items-start gap-1">
                                     <span class="material-symbols-outlined text-[14px]">info</span>
                                     <span>Draf di atas otomatis terisi oleh rumusan tim pakar. Anda tetap bisa menyesuaikan tanda baca atau *typo* kecil jika diperlukan sebelum tombol publikasi ditekan.</span>
                                 </p>
+                            </div>
+                            @endif
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-gray-700 mb-2 flex justify-between items-end">
+                                    @if($usulan->status == 'diterima') 
+                                        <span>Alasan Revisi<span class="text-red-500">*</span></span>
+                                    @else
+                                        <span>Alasan Penolakan<span class="text-red-500">*</span></span>
+                                    @endif
+                                    <span class="text-xs text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100">Berdasarkan Rumusan Pakar</span>
+                                </label>
+                                
+                                {{-- MODIFIKASI: Mengambil data teks_rekomendasi milik pakar secara otomatis --}}
+                                <textarea name="alasan_revisi" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors text-lg font-medium bg-white shadow-inner" placeholder="Tuliskan alasan revisi...">{{ old('alasan_revisi', $usulan->alasan_revisi) }}</textarea>
                             </div>
                             
                             <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
@@ -179,7 +244,7 @@
                                     </div>
                                     <div>
                                         <p class="font-semibold text-sm text-gray-800">{{ $assign->user->name ?? 'Pakar' }}</p>
-                                        <p class="text-[10px] text-gray-500">Validator Assignee</p>
+                                        <p class="text-[10px] text-gray-500">{{ $assign->user->role }}</p>
                                     </div>
                                 </div>
                                 @php
@@ -237,21 +302,26 @@
 <script>
     document.getElementById('submitPublish').addEventListener('click', function(e) {
         e.preventDefault();
+
+        const teksFinalField = document.querySelector('textarea[name="teks_final"]');
         
-        const teksFinal = document.querySelector('textarea[name="teks_final"]').value.trim();
-        if (!teksFinal) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Teks Final Kosong',
-                text: 'Silakan isi teks terjemahan final sebelum mempublikasikan.',
-                confirmButtonColor: '#059669'
-            });
-            return;
+        // Hanya cek kalau field teks_final memang ada (status diterima)
+        if (teksFinalField) {
+            const teksFinal = teksFinalField.value.trim();
+            if (!teksFinal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Teks Final Kosong',
+                    text: 'Silakan isi teks terjemahan final sebelum mempublikasikan.',
+                    confirmButtonColor: '#059669'
+                });
+                return;
+            }
         }
 
         Swal.fire({
-            title: 'Publikasikan Terjemahan?',
-            text: "Terjemahan baru resmi tayang. Versi lama otomatis masuk ke dalam brankas riwayat perubahan.",
+            title: 'Publikasikan Hasil Validasi?',
+            text: "Hasil validasi akan resmi diterbitkan.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#059669',

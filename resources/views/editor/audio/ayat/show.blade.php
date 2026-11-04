@@ -60,18 +60,17 @@
         <!-- CARD: UPLOAD ZIP (MASSAL) -->
         <!-- CARD: UPLOAD ZIP (MASSAL) -->
         <!-- CARD: UPLOAD ZIP (MASSAL) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" 
-             x-data="{ 
-                 jenisZip: '', 
-                 selectedLanggam: '',
-                 langgamsData: {{ Js::from($langgams) }},
-                 get qarisTersedia() {
-                     if (!this.selectedLanggam) return [];
-                     // Cari langgam yang dipilih, lalu return daftar pelantunnya
-                     const langgam = this.langgamsData.find(l => l.id == this.selectedLanggam);
-                     return langgam && langgam.pelantuns ? langgam.pelantuns : [];
-                 }
-             }">
+       <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" 
+            x-data="{ 
+                jenisZip: '', 
+                selectedLanggam: '',
+                langgamsData: {{ Js::from($langgams) }},
+                get qarisTersedia() {
+                    if (!this.selectedLanggam) return [];
+                    const langgam = this.langgamsData.find(l => l.id == this.selectedLanggam);
+                    return langgam && langgam.pelantuns ? langgam.pelantuns : [];
+                }
+            }">
             <div class="bg-emerald-50/50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
                 <span class="material-symbols-outlined text-emerald-600">folder_zip</span>
                 <h3 class="text-lg font-bold text-gray-800">Upload ZIP (Massal) untuk {{ $surah->nama_latin }}</h3>
@@ -102,11 +101,14 @@
                         </div>
 
                         <!-- Muncul HANYA jika milih ARAB -->
+                        <!-- Muncul HANYA jika milih ARAB -->
                         <div x-show="jenisZip === 'arab'" x-transition class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
                             <div>
                                 <label class="block text-[11px] font-semibold text-gray-600 mb-1.5">Pilih Langgam</label>
-                                <!-- Tambahin x-model="selectedLanggam" di sini -->
-                                <select name="langgam_id" x-model="selectedLanggam" x-bind:required="jenisZip === 'arab'" class="w-full rounded-lg border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 outline-none">
+                                <select name="langgam_id" 
+                                        x-model="selectedLanggam" 
+                                        x-bind:required="jenisZip === 'arab'" 
+                                        class="w-full rounded-lg border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 outline-none">
                                     <option value="">-- Pilih Langgam --</option>
                                     @foreach($langgams as $langgam)
                                         <option value="{{ $langgam->id }}">{{ $langgam->nama }}</option>
@@ -115,8 +117,9 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold text-gray-600 mb-1.5">Qari (Arab)</label>
-                                <!-- Pilihan Qari di-generate otomatis oleh Alpine.js berdasarkan langgam -->
-                                <select name="qari_id" x-bind:required="jenisZip === 'arab'" class="w-full rounded-lg border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 outline-none">
+                                <select name="pelantun_id" 
+                                        x-bind:required="jenisZip === 'arab'" 
+                                        class="w-full rounded-lg border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 outline-none">
                                     <option value="">-- Pilih Qari --</option>
                                     <template x-for="qari in qarisTersedia" :key="qari.id">
                                         <option :value="qari.id" x-text="qari.nama"></option>
@@ -154,28 +157,83 @@
         <div id="ajax-container">
             
             <!-- LIST AYAT & UPLOAD ECERAN -->
+            <!-- LIST AYAT & UPLOAD ECERAN -->
             <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm transition-opacity duration-300" id="ayat-list-card">
-                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-start gap-4">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800">Daftar Audio Per Langgam</h3>
-                        <p class="text-xs text-gray-500">Pilih langgam untuk melihat dan mengelola audionya.</p>
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">Daftar Audio Per Ayat</h3>
+                            <p class="text-xs text-gray-500">Filter berdasarkan Langgam, Qari, atau Pembaca Gorontalo.</p>
+                        </div>
                     </div>
-                    
-                    <div class="flex-1 max-w-sm">
-                        <form id="filterLanggamForm" action="{{ route('editor.audio.ayat.show', $surah->id) }}" method="GET" class="flex gap-2">
-                            <select name="langgam_id" required class="flex-1 rounded-xl border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none">
-                                <option value="">-- Pilih Langgam --</option>
+
+                    <!-- FILTER FORM -->
+                    <form id="filterLanggamForm" action="{{ route('editor.audio.ayat.show', $surah->id) }}" method="GET" 
+                        class="grid grid-cols-1 md:grid-cols-4 gap-3"
+                        x-data="{
+                            selectedLanggam: '{{ $langgamId ?? '' }}',
+                            selectedQari: '{{ $qariId ?? '' }}',
+                            langgamsData: {{ Js::from($langgams) }},
+                            get qarisTersedia() {
+                                if (!this.selectedLanggam) return [];
+                                const langgam = this.langgamsData.find(l => l.id == this.selectedLanggam);
+                                return langgam && langgam.pelantuns ? langgam.pelantuns : [];
+                            },
+                            init() {
+                                // Set selected Qari setelah Alpine siap
+                                this.$nextTick(() => {
+                                    if (this.$refs.qariSelect && this.selectedQari) {
+                                        this.$refs.qariSelect.value = this.selectedQari;
+                                    }
+                                });
+                            }
+                        }">
+                        
+                        <!-- Langgam -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-1">Langgam (Arab)</label>
+                            <select name="langgam_id" x-model="selectedLanggam" class="w-full rounded-xl border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 outline-none">
+                                <option value="">-- Semua Langgam --</option>
                                 @foreach($langgams as $langgam)
-                                    <option value="{{ $langgam->id }}" {{ request('langgam_id') == $langgam->id ? 'selected' : '' }}>
+                                    <option value="{{ $langgam->id }}" {{ $langgamId == $langgam->id ? 'selected' : '' }}>
                                         {{ $langgam->nama }}
                                     </option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl transition shadow-sm active:scale-95 flex items-center gap-1">
+                        </div>
+
+                        <!-- Qari (dependent) -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-1">Qari (Arab)</label>
+                            <select name="qari_id" 
+                                    class="w-full rounded-xl border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 outline-none"
+                                    x-ref="qariSelect">
+                                <option value="">-- Semua Qari --</option>
+                                <template x-for="qari in qarisTersedia" :key="qari.id">
+                                    <option :value="qari.id" x-text="qari.nama"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <!-- Pembaca Gorontalo -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-1">Pembaca Gorontalo</label>
+                            <select name="pembaca_gorontalo_id" class="w-full rounded-xl border-gray-300 bg-white py-2 px-3 text-sm focus:border-emerald-500 outline-none">
+                                <option value="">-- Semua Pembaca --</option>
+                                @foreach($pembacas as $p)
+                                    <option value="{{ $p->id }}" {{ $pembacaGorontaloId == $p->id ? 'selected' : '' }}>
+                                        {{ $p->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-xl transition shadow-sm active:scale-95 flex items-center justify-center gap-1">
                                 <span class="material-symbols-outlined text-sm">search</span> Filter
                             </button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
                 
                 <div class="overflow-x-auto">
@@ -191,14 +249,28 @@
                         <tbody class="divide-y divide-gray-100">
                             @foreach($surah->ayats as $ayat)
                                 @php
-                                    $langgamId = request('langgam_id');
-                                    $dataAudio = $langgamId 
-                                        ? \App\Models\AyatAudio::where('langgam_id', $langgamId)->where('ayat_id', $ayat->id)->first() 
-                                        : null;
-                                    
-                                    $audioId = $dataAudio ? $dataAudio->id : null;
-                                    $fileArab = $dataAudio ? $dataAudio->file_path_arab : null;
-                                    $fileGto = $dataAudio ? $dataAudio->file_path_gorontalo : null;
+                                    // ===== AUDIO ARAB =====
+                                    $audioArab = null;
+                                    if ($langgamId || $qariId) {
+                                        $queryArab = \App\Models\AudioArab::where('ayat_id', $ayat->id);
+                                        if ($langgamId) $queryArab->where('langgam_id', $langgamId);
+                                        if ($qariId) $queryArab->where('qari_id', $qariId);
+                                        $audioArab = $queryArab->first();
+                                    }
+
+                                    // ===== AUDIO GORONTALO =====
+                                    $audioGto = null;
+                                    if ($pembacaGorontaloId) {
+                                        $audioGto = \App\Models\AudioGorontalo::where('ayat_id', $ayat->id)
+                                            ->where('pembaca_gorontalo_id', $pembacaGorontaloId)
+                                            ->first();
+                                    } elseif (!$langgamId && !$qariId) {
+                                        // Kalau tidak ada filter sama sekali, tampilkan salah satu saja (opsional)
+                                        $audioGto = \App\Models\AudioGorontalo::where('ayat_id', $ayat->id)->first();
+                                    }
+
+                                    $fileArab = $audioArab?->file_path;
+                                    $fileGto  = $audioGto?->file_path;
                                 @endphp
 
                                 <tr class="hover:bg-gray-50 transition-colors group">
@@ -208,13 +280,13 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 align-top">
-                                        <p class="text-2xl font-arabic text-right mb-3 text-gray-800 leading-loose" dir="rtl">{{ $ayat->Arab ?? 'Teks Arab Kosong' }}</p>
+                                        <p class="text-3xl arabic-text text-right mb-3 text-gray-800 leading-loose" dir="rtl">{{ $ayat->Arab ?? 'Teks Arab Kosong' }}</p>
                                         <p class="text-sm text-gray-600 italic">"{{ $ayat->teks_gorontalo ?? 'Teks Gorontalo belum diinput.' }}"</p>
                                     </td>
                                     
                                     <td class="px-6 py-4 align-top">
                                         <div class="flex flex-col gap-3 w-full">
-                                            <!-- Custom Player Arab -->
+                                            <!-- Player Arab -->
                                             @if($fileArab)
                                                 <div class="custom-audio-player flex items-center gap-3 bg-gray-50 border border-gray-200 p-2.5 rounded-xl w-64 shadow-sm hover:border-emerald-300 transition-colors">
                                                     <audio src="{{ asset('storage/' . $fileArab) }}" preload="metadata" class="hidden-audio"></audio>
@@ -237,15 +309,15 @@
                                                         <span class="material-symbols-outlined text-[18px]">music_off</span>
                                                     </div>
                                                     <div class="flex-1">
-                                                        <div class="flex justify-between items-center mb-0.5">
-                                                            <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider">Arab</span>
-                                                        </div>
-                                                        <span class="text-[10px] text-red-400 italic">{{ $langgamId ? 'Belum tersedia' : 'Pilih langgam dulu' }}</span>
+                                                        <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider">Arab</span>
+                                                        <span class="text-[10px] text-red-400 italic block">
+                                                            {{ ($langgamId || $qariId) ? 'Belum tersedia' : 'Filter Langgam/Qari dulu' }}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             @endif
 
-                                            <!-- Custom Player Gorontalo -->
+                                            <!-- Player Gorontalo -->
                                             @if($fileGto)
                                                 <div class="custom-audio-player flex items-center gap-3 bg-gray-50 border border-gray-200 p-2.5 rounded-xl w-64 shadow-sm hover:border-emerald-300 transition-colors">
                                                     <audio src="{{ asset('storage/' . $fileGto) }}" preload="metadata" class="hidden-audio"></audio>
@@ -268,10 +340,10 @@
                                                         <span class="material-symbols-outlined text-[18px]">music_off</span>
                                                     </div>
                                                     <div class="flex-1">
-                                                        <div class="flex justify-between items-center mb-0.5">
-                                                            <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider">Gorontalo</span>
-                                                        </div>
-                                                        <span class="text-[10px] text-red-400 italic">{{ $langgamId ? 'Belum tersedia' : 'Pilih langgam dulu' }}</span>
+                                                        <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider">Gorontalo</span>
+                                                        <span class="text-[10px] text-red-400 italic block">
+                                                            {{ $pembacaGorontaloId ? 'Belum tersedia' : 'Filter Pembaca dulu' }}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             @endif
@@ -280,11 +352,10 @@
 
                                     <td class="px-6 py-4 text-center align-top">
                                         <button type="button" 
-                                            onclick="openSingleModal('{{ $audioId ?? '' }}', {{ $ayat->id }}, {{ $ayat->nomorAyat }})"
-                                            class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white text-gray-700 border border-gray-200 rounded-lg text-xs font-bold hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            {{ !$langgamId ? 'disabled' : '' }}>
+                                            onclick="openSingleModal({{ $ayat->id }}, {{ $ayat->nomorAyat }})"
+                                            class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white text-gray-700 border border-gray-200 rounded-lg text-xs font-bold hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 transition-all shadow-sm active:scale-95">
                                             <span class="material-symbols-outlined text-[16px]">audio_file</span>
-                                            {{ $fileArab || $fileGto ? 'Ubah Audio' : 'Upload Audio' }}
+                                            {{ ($fileArab || $fileGto) ? 'Ubah Audio' : 'Upload Audio' }}
                                         </button>
                                     </td>
                                 </tr>
@@ -320,7 +391,7 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('editor.audio.ayat.storeSingle', $surah->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <form action="{{ route('editor.audio.ayat.storeSingle', 0) }}" method="POST" enctype="multipart/form-data" class="space-y-4" id="singleUploadForm">
                         @csrf
                         <input type="hidden" name="audio_id" id="modalAyatAudioId" value="">
                         <input type="hidden" name="ayat_id" id="modalAyatId" value="">
@@ -460,46 +531,65 @@
 
     // FUNGSI BIND FORM AJAX
     function bindFilterForm() {
-        const filterForm = document.getElementById('filterLanggamForm');
-        if (filterForm) {
-            filterForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                
-                const url = new URL(this.action);
-                url.search = new URLSearchParams(new FormData(this)).toString();
-                
-                const cardContainer = document.getElementById('ayat-list-card');
-                cardContainer.style.opacity = '0.4';
-                cardContainer.style.pointerEvents = 'none';
+    const filterForm = document.getElementById('filterLanggamForm');
+    if (!filterForm) return;
 
-                fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        
-                        // Ekstrak wrapper ajax dari hasil request
-                        const newContent = doc.getElementById('ajax-container');
+    // Hindari event listener dobel
+    const newForm = filterForm.cloneNode(true);
+    filterForm.parentNode.replaceChild(newForm, filterForm);
 
-                        if (newContent) {
-                            // Ganti isi DOM
-                            document.getElementById('ajax-container').innerHTML = newContent.innerHTML;
-                            // Update URL browser tanpa reload
-                            window.history.pushState({}, '', url); 
-                            
-                            // Wajib jalanin ulang event listener
-                            initAudioPlayers(); 
-                            bindFilterForm();   
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        cardContainer.style.opacity = '1';
-                        cardContainer.style.pointerEvents = 'auto';
-                    });
-            });
+    newForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const url = new URL(this.action);
+        url.search = new URLSearchParams(new FormData(this)).toString();
+
+        const cardContainer = document.getElementById('ayat-list-card');
+        if (cardContainer) {
+            cardContainer.style.opacity = '0.4';
+            cardContainer.style.pointerEvents = 'none';
         }
-    }
+
+        fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.text();
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newContent = doc.getElementById('ajax-container');
+
+            if (newContent) {
+                const container = document.getElementById('ajax-container');
+                container.innerHTML = newContent.innerHTML;
+
+                // ===== FIX UTAMA: Init ulang Alpine =====
+                if (window.Alpine) {
+                    Alpine.initTree(container);
+                }
+
+                window.history.pushState({}, '', url);
+
+                // Re-init
+                initAudioPlayers();
+                bindFilterForm();
+            } else {
+                window.location.href = url.toString();
+            }
+        })
+        .catch(error => {
+            console.error('Filter error:', error);
+            if (cardContainer) {
+                cardContainer.style.opacity = '1';
+                cardContainer.style.pointerEvents = 'auto';
+            }
+            alert('Gagal memfilter. Silakan refresh halaman.');
+        });
+    });
+}
 
     // Eksekusi saat halaman pertama load
     document.addEventListener('DOMContentLoaded', function() {
@@ -513,28 +603,23 @@
     });
 
     // FUNGSI MODAL DINAMIS
-    function openSingleModal(ayatAudioId, ayatId, noAyat) {
-        // Ambil ID Langgam dari DOM terkini
-        const langgamDipilih = document.getElementById('modalHiddenLanggamId').value;
-        if(!langgamDipilih) {
-            alert('Silakan pilih dan filter Langgam terlebih dahulu!');
-            return;
-        }
+    function openSingleModal(ayatId, noAyat) {
+    const modal = document.getElementById('singleUploadModal');
+    const modalContent = modal.querySelector('.modal-content-wrapper');
+    const form = document.getElementById('singleUploadForm');
 
-        // Ambil elemen modal secara dinamis (karena habis di-replace via AJAX)
-        const modal = document.getElementById('singleUploadModal');
-        const modalContent = modal.querySelector('.modal-content-wrapper');
+    // Set action form ke ayat_id yang benar
+    form.action = `{{ url('editor/audio/ayat') }}/${ayatId}/upload-single`;
 
-        document.getElementById('modalAyatAudioId').value = ayatAudioId || '';
-        document.getElementById('modalAyatId').value = ayatId;
-        document.getElementById('modalNoAyat').textContent = noAyat;
-        
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            modalContent.classList.remove('scale-95');
-        }, 10);
-    }
+    document.getElementById('modalAyatId').value = ayatId;
+    document.getElementById('modalNoAyat').textContent = noAyat;
+    
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modalContent.classList.remove('scale-95');
+    }, 10);
+}
 
     function closeSingleModal() {
         const modal = document.getElementById('singleUploadModal');

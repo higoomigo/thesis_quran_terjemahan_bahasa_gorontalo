@@ -1,9 +1,9 @@
 @php
     $user = Auth::user();
     $role = $user->role;
-    $isAdminOrPakar = in_array($role, ['teologi', 'linguistik', 'admin']);
-    $isEditor = $role === 'editor';
-    $isNormalUser = !($isAdminOrPakar || $isEditor);
+    $isEditorOrPakar = in_array($role, ['teologi', 'linguistik', 'editor']);
+    $isAdmin = $role === 'admin';
+    $isNormalUser = !($isEditorOrPakar || $isAdmin);
 @endphp
 
 <!DOCTYPE html>
@@ -23,19 +23,43 @@
             background-color: #f8fafc;
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body
     class="text-slate-900 antialiased {{ !$isNormalUser ? 'flex h-screen overflow-hidden' : 'flex flex-col min-h-screen' }}">
 
+    {{-- @if (session('success'))
+        <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
+            <div
+                class="flash-message bg-emerald-100 border-l-4 border-emerald-600 text-emerald-900 p-3 rounded shadow-lg">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-2xl">check_circle</span>
+                    <p class="font-bold text-sm">{{ session('success') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
+            <div class="flash-message bg-red-100 border-l-4 border-red-600 text-red-900 p-3 rounded shadow-lg">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-red-600 text-2xl">error</span>
+                    <p class="font-bold text-sm">{{ session('error') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif --}}
+
     {{-- SIDEBAR UNTUK ADMIN / PAKAR --}}
-    @if ($isAdminOrPakar)
+    @if ($isEditorOrPakar)
         @include('partials.sidebar')
     @endif
 
     {{-- SIDEBAR KHUSUS UNTUK EDITOR --}}
-    @if ($isEditor)
-        @include('partials.sidebar_editor')
+    @if ($isAdmin)
+        @include('partials.sidebar_admin')
     @endif
 
     {{-- KONTEN UTAMA --}}
@@ -152,6 +176,16 @@
                                         <p class="text-red-500 text-xs mt-1.5 font-semibold">{{ $message }}</p>
                                     @enderror
                                 </div>
+                                <div>
+                                    <label for="no_hp" class="block text-sm font-bold text-slate-700 mb-2">Nomor HP</label>
+                                    <input type="text" id="no_hp" name="no_hp"
+                                        value="{{ old('no_hp', $user->no_hp) }}"
+                                        class="w-full rounded-xl border-slate-300 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm p-3 border text-slate-600 bg-slate-50"
+                                        required>
+                                    @error('no_hp')
+                                        <p class="text-red-500 text-xs mt-1.5 font-semibold">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
                                 <div>
                                     <label for="bio" class="block text-sm font-bold text-slate-700 mb-2">Bio
@@ -173,13 +207,13 @@
                                         Simpan Identitas
                                     </button>
 
-                                    @if (session('status') === 'profile-updated')
+                                    {{-- @if (session('status') === 'profile-updated')
                                         <div
                                             class="flex items-center gap-1.5 text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg">
                                             <span class="material-symbols-outlined text-[18px]">check_circle</span>
                                             Berhasil disimpan
                                         </div>
-                                    @endif
+                                    @endif --}}
                                 </div>
 
                             </div>
@@ -285,6 +319,8 @@
             </div>
         </main>
     </div>
+
+    <x-toaster />
 
 </body>
 

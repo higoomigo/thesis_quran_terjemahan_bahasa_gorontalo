@@ -101,9 +101,16 @@
 
         .translation-text {
             font-family: 'Inter', sans-serif;
-            font-size: 18px;
+            font-size: 20px;;
             line-height: 1.8;
             color: #334155;
+        }
+
+        .translation-text-indo {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #525e70;
         }
 
         .custom-scrollbar::-webkit-scrollbar {
@@ -123,10 +130,34 @@
             background: #94a3b8;
         }
     </style>
+
+    <style>
+        #loading-screen {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #loading-screen.hidden-loader {
+            opacity: 0;
+            visibility: hidden;
+        }
+    </style>
+    @include('partials.pwa')
 </head>
 
 <body class="text-on-surface antialiased min-h-screen flex flex-col relative overflow-x-hidden">
-
+    <div id="loading-screen" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#f9f9ff]">
+        <div class="relative flex items-center justify-center">
+            <!-- Spinner Outer Ring -->
+            <div class="w-16 h-16 border-4 border-emerald-200 border-t-emerald-900 rounded-full animate-spin"></div>
+            <!-- Icon Al-Qur'an di Tengah -->
+            
+        </div>
+        <!-- Teks Khas Bahasa Gorontalo / Indonesia -->
+        <p class="mt-4 text-xs md:text-sm font-bold text-slate-600 tracking-wider uppercase animate-pulse">
+            Sabaripo...
+        </p>
+    </div>
     <!-- 1. READING PROGRESS BAR (Tetap di atas layar) -->
     <div class="fixed top-0 left-0 w-full h-1.5 bg-gray-200 z-[100]">
         <div id="readingProgress" class="h-full bg-primary transition-all duration-150 ease-out" style="width: 0%;">
@@ -272,8 +303,11 @@
                     <!-- Terjemahan & 3 Tombol Aksi -->
                     <div class="w-full bg-white rounded-2xl p-6  flex flex-col gap-4">
                         <!-- Teks Terjemahan -->
-                        <p class="translation-text">
+                        <p class="translation-text font-normal">
                             {{ $ayat->teks_gorontalo }}
+                        </p>
+                        <p class="translation-text-indo font-light">
+                            {{ $ayat->teksIndo }}
                         </p>
 
                         <!-- Garis Pembatas -->
@@ -282,20 +316,33 @@
                         <!-- Dengarkan, Salin, Riwayat & Usulan -->
                         <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
                             <!-- Tombol Play Audio -->
-                            <button
-                                onclick="playAudio({{ $surah->no_surah ?? 1 }}, {{ $ayat->nomorAyat }}, 'murottal',this)"
-                                class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm">
-                                <span class="material-symbols-outlined text-[20px] icon-play">play_circle</span>
-                                <span class="text-play">Arab</span>
-                            </button>
+                            <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                                {{-- Tombol Arab --}}
+                                @php
+                                    $audioArab = $ayat->audioArabs->first(); // atau filter berdasarkan langgam/qari tertentu
+                                @endphp
+                                <button
+                                    onclick="playAudio(this)"
+                                    data-src="{{ $audioArab ? asset('storage/' . $audioArab->file_path) : '' }}"
+                                    class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm {{ !$audioArab ? 'opacity-40 cursor-not-allowed' : '' }}"
+                                    {{ !$audioArab ? 'disabled' : '' }}>
+                                    <span class="material-symbols-outlined text-[20px] icon-play">play_circle</span>
+                                    <span class="text-play">Arab</span>
+                                </button>
 
-                            <button
-                                onclick="playAudio({{ $surah->no_surah ?? 1 }}, {{ $ayat->nomorAyat }}, 'gorontalo', this)"
-                                data-text="Gorontalo" data-icon="record_voice_over"
-                                class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm">
-                                <span class="material-symbols-outlined text-[20px] icon-play">record_voice_over</span>
-                                <span class="text-play">Gorontalo</span>
-                            </button>
+                                {{-- Tombol Gorontalo --}}
+                                @php
+                                    $audioGto = $ayat->audioGorontalos->first();
+                                @endphp
+                                <button
+                                    onclick="playAudio(this)"
+                                    data-src="{{ $audioGto ? asset('storage/' . $audioGto->file_path) : '' }}"
+                                    class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm {{ !$audioGto ? 'opacity-40 cursor-not-allowed' : '' }}"
+                                    {{ !$audioGto ? 'disabled' : '' }}>
+                                    <span class="material-symbols-outlined text-[20px] icon-play">record_voice_over</span>
+                                    <span class="text-play">Gorontalo</span>
+                                </button>
+                            </div>
 
                             <!-- Tombol Salin -->
                             <button
@@ -397,6 +444,21 @@
     </div>
 
     <script>
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loading-screen');
+            if (loader) {
+                // Tambahkan efek fade-out
+                loader.classList.add('hidden-loader');
+
+                // Hilangkan dari DOM total setelah transisi 400ms selesai
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 400);
+            }
+        });
+    </script>
+
+    <script>
         // --- LOGIKA PROGRESS BAR BACAAN ---
         window.addEventListener('scroll', () => {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
@@ -432,6 +494,7 @@
         let currentFontSizeTrans = 18;
         const arabicTexts = document.querySelectorAll('.arabic-text');
         const translationTexts = document.querySelectorAll('.translation-text');
+        const translationTextsIndo = document.querySelectorAll('.translation-text-indo');
 
         document.getElementById('fontIncrease')?.addEventListener('click', () => {
             if (currentFontSizeArab < 56) { // Maksimal ukuran
@@ -439,6 +502,7 @@
                 currentFontSizeTrans += 1;
                 arabicTexts.forEach(text => text.style.fontSize = currentFontSizeArab + 'px');
                 translationTexts.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
+                translationTextsIndo.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
             }
         });
 
@@ -448,6 +512,7 @@
                 currentFontSizeTrans -= 1;
                 arabicTexts.forEach(text => text.style.fontSize = currentFontSizeArab + 'px');
                 translationTexts.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
+                translationTextsIndo.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
             }
         });
 
@@ -460,7 +525,7 @@
         }
     </script>
 
-    <script>
+    {{-- <script>
         // Variabel global buat nyimpen data audio yang lagi jalan
         let currentAudio = null;
         let currentButton = null;
@@ -566,6 +631,56 @@
             if (textSpan) {
                 textSpan.innerHTML = defaultText;
             }
+        }
+    </script> --}}
+
+    <script>
+        let currentAudio = null;
+        let currentBtn = null;
+
+        function playAudio(btn) {
+            const src = btn.dataset.src;
+
+            if (!src) {
+                alert('Audio belum tersedia');
+                return;
+            }
+
+            // Kalau lagi main di tombol yang sama → pause
+            if (currentBtn === btn && currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+                resetButton(btn);
+                return;
+            }
+
+            // Stop audio sebelumnya
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentBtn) resetButton(currentBtn);
+            }
+
+            // Mainkan yang baru
+            currentAudio = new Audio(src);
+            currentBtn = btn;
+
+            btn.querySelector('.icon-play').textContent = 'pause_circle';
+            btn.querySelector('.text-play').textContent = 'Pause';
+
+            currentAudio.play();
+
+            currentAudio.onended = () => {
+                resetButton(btn);
+                currentAudio = null;
+                currentBtn = null;
+            };
+        }
+
+        function resetButton(btn) {
+            const isArab = btn.querySelector('.text-play').textContent.toLowerCase().includes('arab') || 
+                        btn.querySelector('.icon-play').textContent.includes('play_circle');
+            
+            btn.querySelector('.icon-play').textContent = isArab ? 'play_circle' : 'record_voice_over';
+            btn.querySelector('.text-play').textContent = isArab ? 'Arab' : 'Gorontalo';
         }
     </script>
 

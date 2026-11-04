@@ -156,12 +156,67 @@
             </form>
 
             <p class="text-sm text-on-surface-variant mt-4 text-center">
-                    Belum punya akun?
-                    <a href="{{ route('register') }}" class="text-primary font-semibold hover:text-primary-container transition-colors">
-                        Daftar Sekarang
-                    </a>
-                </p>
+                Belum punya akun?
+                <a href="{{ route('register') }}" class="text-primary font-semibold hover:text-primary-container transition-colors">
+                    Daftar Sekarang
+                </a>
+            </p>
 
+            <div class="grid grid-cols-2 text-center text-sm text-on-surface-variant">
+                <form action="{{ route('login') }}" method="POST" class="col-span-1 p-2 m-2 bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 rounded-xl" >
+                    @csrf
+                    <input type="text" value="mansur.linguis1@gorontalo.com" readonly hidden name="email">
+                    <input type="text" value="password" readonly hidden name="password">
+                    <button type="submit" class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-slate-100 ">person</span>
+                        <p class="text-sm text-slate-100 ">Mansur Linguistik</p>
+                    </button>
+                </form>
+                <form action="{{ route('login') }}" method="POST" class="col-span-1 p-2 m-2 bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 rounded-xl" >
+                    @csrf
+                    <input type="text" value="yusuf.teologi1@gorontalo.com" readonly hidden name="email">
+                    <input type="text" value="password" readonly hidden name="password">
+                    <button type="submit" class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-slate-100 ">person</span>
+                        <p class="text-sm text-slate-100 ">Yusuf Teologi</p>
+                    </button>
+                </form>
+                <form action="{{ route('login') }}" method="POST" class="col-span-1 p-2 m-2 bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 rounded-xl" >
+                    @csrf
+                    <input type="text" value="ahmad.teologi2@gorontalo.com" readonly hidden name="email">
+                    <input type="text" value="password" readonly hidden name="password">
+                    <button type="submit" class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-slate-100 ">person</span>
+                        <p class="text-sm text-slate-100 ">Ahmad Teologi</p>
+                    </button>
+                </form>
+                <form action="{{ route('login') }}" method="POST" class="col-span-1 p-2 m-2 bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 rounded-xl" >
+                    @csrf
+                    <input type="text" value="tim_editor@gorontalo.com" readonly hidden name="email">
+                    <input type="text" value="password" readonly hidden name="password">
+                    <button type="submit" class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-slate-100 ">person</span>
+                        <p class="text-sm text-slate-100 ">Tim Editor</p>
+                    </button>
+                </form>
+                <form action="{{ route('login') }}" method="POST" class="col-span-1 p-2 m-2 bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 rounded-xl" >
+                    @csrf
+                    <input type="text" value="admin@quranhulontalo.com" readonly hidden name="email">
+                    <input type="text" value="password" readonly hidden name="password">
+                    <button type="submit" class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-slate-100 ">person</span>
+                        <p class="text-sm text-slate-100 ">Admin</p>
+                    </button>
+                </form> 
+                <form action="{{ route('login') }}" method="POST" class="col-span-1 p-2 m-2 bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 rounded-xl" >
+                    @csrf
+                    <input type="text" value="s_bouti@ung.ac.id" readonly hidden name="email">
+                    <input type="text" value="password" readonly hidden name="password">
+                    <button type="submit" class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-slate-100 ">person</span>
+                        <p class="text-sm text-slate-100 ">Prof. Suleman Bouti</p>
+                    </button>
+                </form>
         </div>
     </div>
     

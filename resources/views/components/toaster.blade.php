@@ -1,4 +1,4 @@
-<!-- resources/views/components/alert.blade.php -->
+<!-- resources/views/components/toaster.blade.php -->
 
 <div class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
     

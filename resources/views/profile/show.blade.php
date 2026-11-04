@@ -1,3 +1,11 @@
+@php
+    $user = Auth::user();
+    $role = $user->role;
+    $isEditorOrPakar = in_array($role, ['teologi', 'linguistik', 'editor']);
+    $isAdmin = $role === 'admin';
+    $isNormalUser = !($isEditorOrPakar || $isAdmin);
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -19,7 +27,14 @@
 
 <body class="text-slate-900 antialiased flex flex-col min-h-screen">
 
-    @include('partials.navbar')
+    @if ($isEditorOrPakar)
+        @include('partials.sidebar')
+    @endif
+
+    {{-- SIDEBAR KHUSUS UNTUK EDITOR --}}
+    @if ($isAdmin)
+        @include('partials.sidebar_admin')
+    @endif
 
     <main class="flex-grow max-w-5xl mx-auto w-full px-4 py-8 sm:px-6 lg:px-8 pb-20">
 

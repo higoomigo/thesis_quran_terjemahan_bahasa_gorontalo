@@ -8,62 +8,73 @@ use App\Models\Surah;
 use App\Models\Ayat;
 use App\Models\Pelantun;
 use App\Models\Langgam;
-use App\Models\AyatAudio;
+use App\Models\AudioArab;
+use App\Models\AudioGorontalo;
 use Illuminate\Support\Facades\Storage;
-use ZipArchive;
 use Illuminate\Support\Facades\File;
+use ZipArchive;
 
 class AudioAyatController extends Controller
 {
     /**
-     * 1. Menampilkan Halaman Daftar Surah (Index)
+     * 1. Halaman daftar Surah
      */
     public function index(Request $request)
     {
         $search = $request->input('search');
 
-        // Query dengan fitur pencarian dan pagination
         $surahs = Surah::orderBy('no_surah', 'asc')
             ->when($search, function ($query, $search) {
                 return $query->where('nama_latin', 'like', "%{$search}%")
                              ->orWhere('arti', 'like', "%{$search}%");
             })
-            ->paginate(15) // Tampilkan 15 data per halaman
+            ->paginate(15)
             ->withQueryString();
-        // Return ke view index yang nanti kita buat (mirip kayak data-terjemahan)
+
         return view('editor.audio.ayat.index', compact('surahs'));
     }
 
     /**
-     * 2. Menampilkan Halaman Detail Ayat & Form Upload di dalam Surah (Show)
+     * 2. Halaman detail ayat + form upload di dalam Surah
      */
-    public function show($surah_id, Request $request)
+    public function show(Request $request, $surah_id)
     {
         $surah = Surah::with('ayats')->findOrFail($surah_id);
-    
-        // 1. Ambil semua Langgam, TAPI sertakan (eager load) Qari yang berelasi dengannya
-        $langgams = Langgam::with(['pelantuns' => function($query) {
+
+        $langgams = Langgam::with(['pelantuns' => function ($query) {
             $query->whereIn('peran', ['qari', 'keduanya']);
         }])->get();
 
-        // 2. Pembaca Gorontalo (karena ga pake langgam, tarik normal aja)
         $pembacas = Pelantun::whereIn('peran', ['pembaca_terjemahan', 'keduanya'])->get();
-
-        // Kita ga perlu tarik $qaris terpisah lagi, karena udah "nempel" di dalam $langgams
-        return view('editor.audio.ayat.show', compact('surah', 'langgams', 'pembacas'));
+        // $qaris = Pelantun::whereIn('peran', ['qari'])->get();
+        
+        // Filter yang dikirim dari form
+        $langgamId           = $request->langgam_id;
+        $qariId              = $request->pelantun_id;
+        $pembacaGorontaloId  = $request->pembaca_gorontalo_id;
+        // dd($langgamId, $qariId, $pembacaGorontaloId);
+        return view('editor.audio.ayat.show', compact(
+            'surah',
+            'langgams',
+            'pembacas',
+            // 'qaris',
+            'langgamId',
+            'qariId',
+            'pembacaGorontaloId'
+        ));
     }
 
     /**
-     * 3. Fungsi Upload Massal via ZIP
+     * 3. Upload massal via ZIP
      */
-   public function storeZip(Request $request, $surah_id)
+    public function storeZip(Request $request, $surah_id)
     {
         $request->validate([
-            'jenis_zip' => 'required|in:arab,gorontalo',
-            'langgam_id' => 'required_if:jenis_zip,arab|nullable|exists:langgams,id',
-            'qari_id' => 'required_if:jenis_zip,arab|nullable|exists:pelantuns,id',
-            'pembaca_gorontalo_id' => 'required_if:jenis_zip,gorontalo|nullable|exists:pelantuns,id',
-            'file_zip' => 'required|mimes:zip|max:102400', 
+            'jenis_zip'              => 'required|in:arab,gorontalo',
+            'langgam_id'             => 'required_if:jenis_zip,arab|nullable|exists:langgams,id',
+            'pelantun_id'                => 'required_if:jenis_zip,arab|nullable|exists:pelantuns,id',
+            'pembaca_gorontalo_id'   => 'required_if:jenis_zip,gorontalo|nullable|exists:pelantuns,id',
+            'file_zip'               => 'required|mimes:zip|max:102400',
         ]);
 
         $surah = Surah::findOrFail($surah_id);
@@ -73,160 +84,142 @@ class AudioAyatController extends Controller
         File::makeDirectory($tempDir, 0755, true, true);
 
         $zip = new ZipArchive;
-        if ($zip->open($zipFile->path()) === TRUE) {
-            $zip->extractTo($tempDir);
-            $zip->close();
-
-            $files = File::files($tempDir);
-            $berhasil = 0;
-
-            foreach ($files as $file) {
-                $filename = $file->getFilename(); 
-                $nomorAyat = (int) pathinfo($filename, PATHINFO_FILENAME);
-
-                $ayat = Ayat::where('no_surah', $surah->no_surah)->where('nomorAyat', $nomorAyat)->first();
-
-                if ($ayat) {
-                    $folderDestinasi = 'audio/ayat/' . $request->jenis_zip;
-                    $namaFileBaru = $surah->no_surah . '_' . $nomorAyat . '_' . time() . '.mp3';
-                    $pathStorage = $folderDestinasi . '/' . $namaFileBaru;
-                    Storage::disk('public')->put($pathStorage, File::get($file));
-
-                    // PISAHKAN LOGIKA ARAB DAN GORONTALO
-                    if ($request->jenis_zip == 'arab') {
-                        \App\Models\AyatAudio::updateOrCreate(
-                            ['ayat_id' => $ayat->id, 'langgam_id' => $request->langgam_id],
-                            ['qari_id' => $request->qari_id, 'file_path_arab' => $pathStorage]
-                        );
-                    } else {
-                        // Gorontalo disimpan dengan langgam_id = null
-                        \App\Models\AyatAudio::updateOrCreate(
-                            ['ayat_id' => $ayat->id, 'langgam_id' => null],
-                            ['pembaca_gorontalo_id' => $request->pembaca_gorontalo_id, 'file_path_gorontalo' => $pathStorage]
-                        );
-                    }
-                    $berhasil++;
-                }
-            }
-            File::deleteDirectory($tempDir);
-            return back()->with('success', "Berhasil menyimpan $berhasil audio!");
-        } else {
+        if ($zip->open($zipFile->path()) !== true) {
             File::deleteDirectory($tempDir);
             return back()->with('error', 'Gagal membuka file ZIP.');
         }
+
+        $zip->extractTo($tempDir);
+        $zip->close();
+
+        $files = File::files($tempDir);
+        $berhasil = 0;
+
+        foreach ($files as $file) {
+            $filename   = $file->getFilename();
+            $nomorAyat  = (int) pathinfo($filename, PATHINFO_FILENAME);
+
+            $ayat = Ayat::where('no_surah', $surah->no_surah)
+                        ->where('nomorAyat', $nomorAyat)
+                        ->first();
+
+            if (!$ayat) {
+                continue;
+            }
+
+            $folderDestinasi = 'audio/ayat/' . $request->jenis_zip;
+            $namaFileBaru    = $surah->no_surah . '_' . $nomorAyat . '_' . time() . '.mp3';
+            $pathStorage     = $folderDestinasi . '/' . $namaFileBaru;
+
+            Storage::disk('public')->put($pathStorage, File::get($file));
+
+            if ($request->jenis_zip === 'arab') {
+                AudioArab::updateOrCreate(
+                    [
+                        'ayat_id'    => $ayat->id,
+                        'pelantun_id'    => $request->pelantun_id,
+                        'langgam_id' => $request->langgam_id,
+                    ],
+                    [
+                        'file_path'  => $pathStorage,
+                    ]
+                );
+            } else {
+                AudioGorontalo::updateOrCreate(
+                    [
+                        'ayat_id'               => $ayat->id,
+                        'pembaca_gorontalo_id'  => $request->pembaca_gorontalo_id,
+                    ],
+                    [
+                        'file_path'             => $pathStorage,
+                    ]
+                );
+            }
+
+            $berhasil++;
+        }
+
+        File::deleteDirectory($tempDir);
+
+        return back()->with('success', "Berhasil menyimpan {$berhasil} audio!");
     }
 
-    // public function storeSingle(Request $request, $surah_id)
-    // {
-    //     $request->validate([
-    //         'ayat_id' => 'required|exists:ayats,id',
-    //         'jenis_audio' => 'required|in:arab,gorontalo',
-    //         'langgam_id' => 'required_if:jenis_audio,arab|nullable|exists:langgams,id',
-    //         'qari_id' => 'required_if:jenis_audio,arab|nullable|exists:pelantuns,id',
-    //         'pembaca_gorontalo_id' => 'required_if:jenis_audio,gorontalo|nullable|exists:pelantuns,id',
-    //         'file_audio' => 'required|mimes:mp3|max:10240',
-    //     ]);
-
-    //     $ayat = Ayat::findOrFail($request->ayat_id);
-    //     $surah = Surah::findOrFail($surah_id);
-        
-    //     $folderDestinasi = 'audio/ayat/' . $request->jenis_audio;
-    //     $namaFileBaru = 'single_' . $surah->no_surah . '_' . $ayat->nomorAyat . '_' . time() . '.mp3';
-        
-    //     $pathStorage = $request->file('file_audio')->storeAs($folderDestinasi, $namaFileBaru, 'public');
-
-    //     // PISAHKAN LOGIKA ARAB DAN GORONTALO
-    //     if ($request->jenis_audio == 'arab') {
-    //         \App\Models\AyatAudio::updateOrCreate(
-    //             ['ayat_id' => $ayat->id, 'langgam_id' => $request->langgam_id],
-    //             ['qari_id' => $request->qari_id, 'file_path_arab' => $pathStorage]
-    //         );
-    //     } else {
-    //         // Gorontalo disimpan dengan langgam_id = null
-    //         \App\Models\AyatAudio::updateOrCreate(
-    //             ['ayat_id' => $ayat->id, 'langgam_id' => null],
-    //             ['pembaca_gorontalo_id' => $request->pembaca_gorontalo_id, 'file_path_gorontalo' => $pathStorage]
-    //         );
-    //     }
-
-    //     return back()->with('success', 'Audio untuk Ayat ke-' . $ayat->nomorAyat . ' berhasil diperbarui!');
-    // }
-
     /**
-     * 4. Fungsi Upload Eceran (1 Ayat Saja) untuk Revisi/Perbaikan
+     * 4. Upload eceran (1 ayat) untuk revisi
      */
     public function storeSingle(Request $request, $ayat_id)
     {
-        // dd($request->all());
         $request->validate([
-            'jenis_audio' => 'required|in:arab,gorontalo',
-            
-            // Wajib diisi HANYA JIKA jenis_audio adalah 'arab'
-            'langgam_id' => 'required_if:jenis_audio,arab',
-            'qari_id'    => 'required_if:jenis_audio,arab',
-            
-            // Wajib diisi HANYA JIKA jenis_audio adalah 'gorontalo'
-            'pembaca_gorontalo_id' => 'required_if:jenis_audio,gorontalo',
-            
-            'file_audio' => 'required|mimes:mp3|max:10240' // contoh kalau file
-        ],[
-            // Custom pesan error biar enak dibaca
-            'langgam_id.required_if' => 'Langgam wajib dipilih untuk audio Arab.',
-            'qari_id.required_if' => 'Qari wajib dipilih untuk audio Arab.',
-            'pembaca_gorontalo_id.required_if' => 'Pembaca wajib dipilih untuk audio Gorontalo.'
+            'jenis_audio'            => 'required|in:arab,gorontalo',
+            'langgam_id'             => 'required_if:jenis_audio,arab|nullable|exists:langgams,id',
+            'pelantun_id'                => 'required_if:jenis_audio,arab|nullable|exists:pelantuns,id',
+            'pembaca_gorontalo_id'   => 'required_if:jenis_audio,gorontalo|nullable|exists:pelantuns,id',
+            // 'file_audio'             => 'required|mimes:mp3|max:10240',
+        ], [
+            'langgam_id.required_if'           => 'Langgam wajib dipilih untuk audio Arab.',
+            'pelantun_id.required_if'              => 'Pelantun wajib dipilih untuk audio Arab.',
+            'pembaca_gorontalo_id.required_if' => 'Pembaca Gorontalo wajib dipilih.',
         ]);
 
-        if (!$request->qari_id && !$request->pembaca_gorontalo_id) {
-            return back()->with('error', 'Pilih minimal satu Qari atau Pembaca Terjemahan!');
-        }
+        $ayat  = Ayat::findOrFail($ayat_id);
+        $surah = Surah::where('no_surah', $ayat->no_surah)->firstOrFail();
 
-        $ayat = Ayat::findOrFail($request->ayat_id);
-        $surah = Surah::findOrFail($ayat_id);
-        
         $folderDestinasi = 'audio/ayat/' . $request->jenis_audio;
-        $namaFileBaru = $surah->no_surah . '_' . $ayat->nomorAyat . '_' . time() . '.mp3';
-        
-        $pathStorage = $request->file('file_audio')->storeAs($folderDestinasi, $namaFileBaru, 'public');
+        $namaFileBaru    = $surah->no_surah . '_' . $ayat->nomorAyat . '_' . time() . '.mp3';
 
-        // $ayatAudio = new AyatAudio();
+        $pathStorage = $request->file('file_audio')->storeAs(
+            $folderDestinasi,
+            $namaFileBaru,
+            'public'
+        );
 
-        // $dataUpdate = [];
-        // if ($request->jenis_audio == 'arab' && $request->qari_id) {
-        //     $kondisiPencarian['qari_id'] = $request->qari_id;
-        //     $dataUpdate['file_path_arab'] = $pathStorage;
-        // } elseif ($request->jenis_audio == 'gorontalo' && $request->pembaca_gorontalo_id) {
-        //     $kondisiPencarian['pembaca_gorontalo_id'] = $request->pembaca_gorontalo_id;
-        //     $dataUpdate['file_path_gorontalo'] = $pathStorage;
-        // }
-
-        if($request->jenis_audio == 'arab'){
-            AyatAudio::updateOrCreate(
-                ['id' => $request->audio_id], // Jika ada ID audio, update; jika tidak, buat baru
+        if ($request->jenis_audio === 'arab') {
+            AudioArab::updateOrCreate(
                 [
-                    'ayat_id' => $ayat->id,
-                    // 'langgam_id' => $request->langgam_id,
-                    'qari_id' => $request->qari_id,
-                    // 'pembaca_gorontalo_id' => $request->pembaca_gorontalo_id,
-                    'file_path_arab' => $request->jenis_audio == 'arab' ? $pathStorage : null,
-                    // 'file_path_gorontalo' => $request->jenis_audio == 'gorontalo' ? $pathStorage : null,
+                    'ayat_id'    => $ayat->id,
+                    'pelantun_id'    => $request->qari_id,
+                    'langgam_id' => $request->langgam_id,
+                ],
+                [
+                    'file_path'  => $pathStorage,
                 ]
             );
-        } elseif($request->jenis_audio == 'gorontalo'){
-            AyatAudio::updateOrCreate(
-                ['id' => $request->audio_id], // Jika ada ID audio, update; jika tidak, buat baru
+        } else {
+            AudioGorontalo::updateOrCreate(
                 [
-                    'ayat_id' => $ayat->id,
-                    'langgam_id' => $request->langgam_id,
-                    // 'qari_id' => $request->qari_id,
-                    'pembaca_gorontalo_id' => $request->pembaca_gorontalo_id,
-                    // 'file_path_arab' => $request->jenis_audio == 'arab' ? $pathStorage : null,
-                    'file_path_gorontalo' => $request->jenis_audio == 'gorontalo' ? $pathStorage : null,
+                    'ayat_id'               => $ayat->id,
+                    'pembaca_gorontalo_id'  => $request->pembaca_gorontalo_id,
+                ],
+                [
+                    'file_path'             => $pathStorage,
                 ]
             );
         }
-        
 
         return back()->with('success', 'Audio untuk Ayat ke-' . $ayat->nomorAyat . ' berhasil diperbarui!');
-         // Hanya untuk testing, nanti diganti dengan redirect back
+    }
+
+    public function destroyArab($id)
+    {
+        $audio = AudioArab::findOrFail($id);
+        $audio->delete();
+
+        return redirect()->route('editor.usulan.index')->with('success', 'Usulan berhasil dihapus');
+    }
+
+        public function destroyGorontalo($id)
+    {
+        $audio = AudioGorontalo::findOrFail($id);
+        $audio->delete();
+
+        return redirect()->route('editor.usulan.index')->with('success', 'Usulan berhasil dihapus');
+    }
+
+        public function destroyAllArab(Request $request)
+    {
+        $audio = AudioArab::where($id);
+        $audio->delete();
+
+        return redirect()->route('editor.usulan.index')->with('success', 'Usulan berhasil dihapus');
     }
 }

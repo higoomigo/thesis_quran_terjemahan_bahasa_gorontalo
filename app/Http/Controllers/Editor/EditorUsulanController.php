@@ -23,7 +23,7 @@ class EditorUsulanController extends Controller
         }, function ($query) {
             // JIKA TIDAK ADA filter status (tampilan default semua data)
             // KUNCI PERBAIKAN: Sembunyikan yang 'diarsipkan' DAN 'dipublikasi' sekaligus
-            return $query->whereNotIn('status', ['menunggu_validasi', 'dipublikasi']);
+            return $query->whereNotIn('status', ['dipublikasi']);
         })
         ->when(request('search'), function ($query) {
             // Gunakan grouping agar kondisi OR tidak membocorkan filter status
@@ -71,7 +71,7 @@ class EditorUsulanController extends Controller
         $usulan = Usulan::findOrFail($id);
         $usulan->delete();
 
-        return redirect()->route('admin.usulan.index')->with('success', 'Usulan berhasil dihapus');
+        return redirect()->route('editor.usulan.index')->with('success', 'Usulan berhasil dihapus');
     }
 
     // Fungsi Arsip

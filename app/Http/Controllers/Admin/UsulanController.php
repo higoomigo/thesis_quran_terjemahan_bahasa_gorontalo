@@ -25,7 +25,7 @@ class UsulanController extends Controller
         }, function ($query) {
             // JIKA TIDAK ADA filter status (tampilan default semua data)
             // KUNCI PERBAIKAN: Sembunyikan yang 'diarsipkan' DAN 'dipublikasi' sekaligus
-            return $query->whereNotIn('status', ['menunggu','diarsipkan', 'dipublikasi']);
+            return $query->whereNotIn('status', ['menunggu','diarsipkan', 'dipublikasi', 'ditolak', 'diterima']);
         })
         ->when(request('search'), function ($query) {
             // Gunakan grouping agar kondisi OR tidak membocorkan filter status
@@ -75,7 +75,7 @@ class UsulanController extends Controller
         $user = Auth::user();
 
         // 2. Cek apakah usulan ini masih "menunggu"
-        if ($usulan->status !== 'menunggu') {
+        if ($usulan->status !== 'menunggu_validasi') {
             return response()->json(['success' => false, 'message' => 'Usulan ini sudah diproses.'], 400);
         }
 

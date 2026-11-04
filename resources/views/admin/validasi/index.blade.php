@@ -207,7 +207,7 @@
                 <thead>
                     <tr class="bg-gray-50 text-gray-600 border-b border-gray-200">
                         <th class="px-6 py-4 font-semibold text-sm">Surah/Ayat</th>
-                        <th class="px-6 py-4 font-semibold text-sm">Usulan Diksi Baru</th>
+                        <th class="px-6 py-4 font-semibold text-sm">Usulan Publik</th>
 
                         <th class="px-6 py-4 font-semibold text-sm">Tanggal Masuk</th>
                         <th class="px-6 py-4 font-semibold text-sm text-center">Aksi</th>
@@ -218,8 +218,8 @@
                         <tr class="hover:bg-emerald-50/30 transition-colors group">
                             <td class="px-6 py-5">
                                 <div class="flex flex-col">
-                                    <span class="font-bold text-on-surface">{{ $item->ayat->nama_surah ?? 'Surah' }}:
-                                        {{ $item->ayat->nomor_ayat ?? '-' }}</span>
+                                    <span class="font-bold text-on-surface">{{ $item->ayat->surah->nama_latin ?? 'Surah' }}:
+                                        {{ $item->ayat->nomorAyat ?? '-' }}</span>
                                     <span class="text-xs text-gray-500">Juz {{ $item->ayat->juz ?? '-' }}</span>
                                 </div>
                             </td>

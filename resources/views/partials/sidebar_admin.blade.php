@@ -83,7 +83,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
                         <span class="whitespace-nowrap">Data Terjemahan</span>
                     </a>
-                    <a href="#" 
+                    <a href="{{ route('editor.audio.ayat.index') }}" 
                        class="flex items-center gap-2 py-2 text-sm text-slate-500 hover:text-emerald-700 font-medium transition-colors">
                         <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
                         <span class="whitespace-nowrap">Manajemen Audio</span>
@@ -95,8 +95,8 @@
                     </a>
                 </div>
 
-                <a href="#"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 cursor-pointer text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium">
+                <a href="{{ route('admin.user.index') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 cursor-pointer    {{ request()->routeIs('admin.user.*') ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium' }}">
                     <span class="material-symbols-outlined text-[20px] shrink-0">group</span>
                     <span class="sidebar-text text-sm whitespace-nowrap">Kelola Pengguna</span>
                 </a>

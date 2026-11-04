@@ -3,62 +3,115 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Usulan;
+use App\Models\UsulanVote;
+use App\Models\UsulanChat;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        
-        $query = Usulan::with(['ayat.surah']);
-        
-        // Filter berdasarkan status
-        if ($request->status && $request->status != 'all') {
-            $query->where('status', $request->status);
-        }
-        
-        // Filter berdasarkan pencarian
-        if ($request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('usulan_teks', 'like', '%' . $request->search . '%')
-                  ->orWhere('nama_pengusul', 'like', '%' . $request->search . '%')
-                  ->orWhere('no_hp', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('ayat', function($q2) use ($request) {
-                      $q2->where('nomorAyat', 'like', '%' . $request->search . '%')
-                         ->orWhereHas('surah', function($q3) use ($request) {
-                             $q3->where('nama_latin', 'like', '%' . $request->search . '%');
-                         });
-                  });
-            });
-        }
-        
-        // Filter berdasarkan rentang waktu
-        if ($request->date_from && $request->date_to) {
-            $query->whereBetween('created_at', [$request->date_from, $request->date_to]);
-        }
-        
-        $usulan = $query->orderBy('created_at', 'desc')->paginate(10);
-        
-        // Statistik untuk dashboard
-        $statusCount = [
-            'menunggu' => Usulan::where('status', 'menunggu')->count(),
-            'diterima' => Usulan::where('status', 'diterima')->count(),
-            'ditolak' => Usulan::where('status', 'ditolak')->count(),
-            'total' => Usulan::count()
-        ];
-        
-        // Hitung persentase perubahan dari minggu lalu
-        $lastWeekCount = Usulan::whereBetween('created_at', [now()->subWeek(), now()])->count();
-        $percentageChange = $statusCount['total'] > 0 ? round(($statusCount['total'] - $lastWeekCount) / max(1, $lastWeekCount) * 100) : 0;
-        
-        // Usulan prioritas per surah
-        $priorityUsulan = Usulan::where('status', 'menunggu')
-            ->whereHas('ayat.surah', function($q) {
-                $q->where('no_surah', 2); // Al-Baqarah
+        $userId = Auth::id();
+
+            // ---------------------------------------------------------
+            // 1. STATISTIK CEPAT
+            // ---------------------------------------------------------
+ 
+            // 🔹 TOTAL DIKLAIM: semua usulan yang di-assign ke validator ini
+            //    pakai whereHas('assignments') buat filter relasi pivot/assignment
+            $totalDiklaim = Usulan::whereHas('assignments', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })->count();
+
+            // 🔹 MENUNGGU: assigned + status menunggu + BELUM vote
+            //    whereDoesntHave = "tidak punya relasi votes dengan user_id ini"
+            $menungguValidasi = Usulan::where('status', 'menunggu_validasi')
+                ->whereHas('assignments', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })
+                ->whereDoesntHave('votes', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })->count();
+
+            // 🔹 SUDAH DIVOTE: hitung dari tabel votes langsung
+            $telahDivalidasi = UsulanVote::where('user_id', $userId)->count();
+
+            // 🔹 DITERIMA: assigned + status akhir 'diterima'
+            $usulanDiterima = Usulan::where('status', 'diterima')
+                ->whereHas('assignments', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })->count();
+
+            // 🔹 DITOLAK: assigned + status akhir 'ditolak'
+            $usulanDitolak = Usulan::where('status', 'ditolak')
+                ->whereHas('assignments', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })->count();
+
+            // 🔹 Persentase persetujuan
+            $totalSelesai = $usulanDiterima + $usulanDitolak;
+            $persetujuan = $totalSelesai > 0
+                ? round(($usulanDiterima / $totalSelesai) * 100)
+                : 0;
+
+            $statistik = [
+                'total_diklaim' => $totalDiklaim,   // ⬅️ BARU
+                'menunggu'      => $menungguValidasi,
+                'divote'        => $telahDivalidasi,
+                'diterima'      => $usulanDiterima, // ⬅️ BARU
+                'ditolak'       => $usulanDitolak,  // ⬅️ BARU
+                'persetujuan'   => $persetujuan,
+            ];
+
+        // ---------------------------------------------------------
+        // 2. ANTREAN TUGAS PRIORITAS (Berdasarkan Deadline Terdekat)
+        // ---------------------------------------------------------
+        // Ambil data yang DIA BELUM VOTE, urutkan dari batas_waktu_diskusi paling mepet
+        $antreanPrioritas = Usulan::with(['ayat.surah'])
+            ->where('status', 'menunggu_validasi')
+            ->whereHas('assignments', function($q) use ($userId) {
+                $q->where('user_id', $userId);
             })
-            ->count();
-        $title = "Dashboard | Admin Panel - Qur'an Gorontalo";
-        return view('dashboard', compact('usulan', 'statusCount', 'percentageChange', 'priorityUsulan' , 'title'));
+            ->whereDoesntHave('votes', function($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->orderBy('batas_waktu_diskusi', 'asc') // Yang mau expired duluan naik ke atas
+            ->paginate(5, ['*'], 'antrean_page'); // Pakai custom page name biar nggak bentrok
+
+        // ---------------------------------------------------------
+        // 3. AKTIVITAS DISKUSI TERBARU (Feed Obrolan & Sistem)
+        // ---------------------------------------------------------
+        // Ambil chat dari usulan-usulan yang di-assign ke validator ini
+        $aktivitasTerbaru = UsulanChat::with(['user', 'usulan.ayat.surah'])
+            ->whereHas('usulan.assignments', function($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->where('created_at', '>=', now()->subDays(3))
+            ->orderBy('created_at', 'desc')
+            ->take(6)
+            ->get();
+
+        // ---------------------------------------------------------
+        // 4. RIWAYAT VALIDASI TERAKHIR (Recent History)
+        // ---------------------------------------------------------
+        // 5 usulan terakhir yang baru saja di-vote oleh user ini
+        $riwayatValidasi = UsulanVote::with(['usulan.ayat.surah'])
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        $title = "Validator Dashboard | Qur'an Gorontalo";
+
+        return view('dashboard', compact(
+            'title', 
+            'statistik', 
+            'antreanPrioritas', 
+            'aktivitasTerbaru', 
+            'riwayatValidasi'
+        ));
     }
 }
+

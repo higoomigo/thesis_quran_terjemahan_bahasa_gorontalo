@@ -7,7 +7,7 @@
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">Master Pelantun</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Master Pelantun</h2> 
                 <p class="text-gray-600 text-sm mt-1">Kelola data Qari dan Pembaca Terjemahan Gorontalo.</p>
             </div>
             <a href="{{ route('editor.audio.pelantun.create') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-sm flex items-center gap-2">

@@ -42,10 +42,11 @@
                 <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-gray-800 font-bold text-lg">QS. {{ $usulan->ayat->surah->nama_latin ?? '?' }}
-                            ({{ $usulan->ayat->no_surah ?? '?' }}:{{ $usulan->ayat->nomor_ayat ?? '?' }})</span>
+                            ({{ $usulan->ayat->no_surah ?? '?' }}:{{ $usulan->ayat->nomorAyat ?? '?' }})</span>
                     </div>
                     <p class="arabic-font text-right text-3xl leading-relaxed mb-6 text-gray-900" dir="rtl">
-                        {{ $usulan->ayat->arab ?? '--' }}</p>
+                    {{-- @dd($usulan->ayat->Arab) --}}
+                        {{ $usulan->ayat->Arab ?? '--' }}</p>
 
                     <div class="border-l-4 border-gray-300 pl-4 py-1">
                         <p class="text-xs text-gray-500 mb-1 uppercase tracking-wider font-semibold">Terjemahan Saat Ini</p>
@@ -57,7 +58,7 @@
 
                 {{-- Usulan Baru --}}
                 <div class="mb-8">
-                    <p class="text-xs text-emerald-600 mb-2 uppercase tracking-wider font-bold">Usulan Diksi Baru</p>
+                    <p class="text-xs text-emerald-600 mb-2 uppercase tracking-wider font-bold">Usulan Publik</p>
                     <p class="text-gray-900 font-medium text-lg mb-3">"{{ $usulan->usulan_teks }}"</p>
                     <p class="text-sm text-gray-500">Oleh: <span
                             class="font-medium text-gray-700">{{ $usulan->nama_pengusul }}</span></p>
@@ -110,7 +111,7 @@
                 <div>
                     <h2 class="text-xl font-bold text-gray-800">Ruang Diskusi</h2>
                     <p class="text-sm text-gray-500 mt-1">Validasi QS.
-                        {{ $usulan->ayat->no_surah ?? '' }}:{{ $usulan->ayat->nomor_ayat ?? '' }}</p>
+                        {{ $usulan->ayat->no_surah ?? '' }}:{{ $usulan->ayat->nomorAyat ?? '' }}</p>
                 </div>
 
                 @if (

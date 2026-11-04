@@ -32,15 +32,25 @@ class Usulan extends Model
         'validated_at' => 'datetime',
     ];
 
+    // Relasi ke ayat
+    public function ayat(): BelongsTo
+    {
+        return $this->belongsTo(Ayat::class, 'ayat_id');
+    }
+
     public function assignments()
     {
         return $this->hasMany(UsulanAssignment::class, 'usulan_id', 'id');
     }
 
-    // Relasi ke ayat
-    public function ayat(): BelongsTo
+    public function chats(): HasMany
     {
-        return $this->belongsTo(Ayat::class, 'ayat_id');
+        return $this->hasMany(UsulanChat::class);
+    }
+
+    public function votes(): HasMany
+    {
+        return $this->hasMany(UsulanVote::class);
     }
 
     // Helper untuk badge status
@@ -79,19 +89,4 @@ class Usulan extends Model
 
         return substr($nama, 0, 2) . str_repeat('*', $panjang - 2);
     }
-
-    public function chats(): HasMany
-    {
-        return $this->hasMany(UsulanChat::class);
-    }
-
-    public function votes(): HasMany
-    {
-        return $this->hasMany(UsulanVote::class);
-    }
-
-    // public function assignments(): HasMany
-    // {
-    //     return $this->hasMany(UsulanAssignment::class);
-    // }
 }
