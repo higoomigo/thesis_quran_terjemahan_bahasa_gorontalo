@@ -7,7 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Usulan Terjemahan - QS {{ $data_surah->no_surah ?? 1 }}:{{ $data_ayat->nomorAyat ?? 1 }} | Qur'an Gorontalo
     </title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
@@ -83,6 +83,7 @@
             }
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
@@ -188,7 +189,7 @@
             <div class="mb-6">
                 <h2 class="text-2xl font-black text-emerald-800 flex items-center gap-2">
                     <span class="material-symbols-outlined text-3xl">history_edu</span>
-                    Jejak Sejarah & Keputusan Validasi
+                     Histori Keputusan Validasi
                 </h2>
                 <p class="text-sm text-gray-600 mt-1 font-medium">
                     Menampilkan semua hasil validasi (diterima maupun ditolak) beserta perubahan terjemahan.

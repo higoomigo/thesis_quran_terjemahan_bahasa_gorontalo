@@ -19,11 +19,12 @@ Route::get('/', function () {
 })->name('home');
 
 // Taro di luar middleware admin ya, biar semua orang bisa lihat
-Route::get('/profil/{id}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+Route::get('/profil/{id}', [ProfileController::class, 'show'])->name('profile.show');
 
 Route::get('mushaf', [SurahController::class, 'index'])->name('mushaf');
 Route::get('surah/{id}', [SurahController::class, 'show'])->name('surah.show');
-Route::get('/juz/{juz_id}', [App\Http\Controllers\SurahController::class, 'showJuz'])->name('juz.show');
+Route::get('/juz/{juz_id}', [SurahController::class, 'showJuz'])->name('juz.show');
+Route::get('/api/get-audio', [SurahController::class, 'getAudioFilter']);
 
 // Route::get('/audio/play/{ayat}/{jenis}', [AudioController::class, 'getAudioUrl']);
 

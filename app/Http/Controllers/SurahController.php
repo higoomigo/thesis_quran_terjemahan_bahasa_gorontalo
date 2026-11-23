@@ -6,9 +6,10 @@ use App\Models\AudioArab;
 use App\Models\AudioGorontalo;
 use App\Models\Surah;
 use App\Models\Ayat;
-
+use App\Models\Langgam;
+use App\Models\Pelantun;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Log;
 
 class SurahController extends Controller
 {
@@ -25,7 +26,7 @@ class SurahController extends Controller
         $ayatsByJuz = $allAyats->groupBy('juz');
 
         $juzData = [];
-        
+
         // Looping untuk Juz 1 sampai 30
         for ($i = 1; $i <= 30; $i++) {
             $juzAyats = $ayatsByJuz->get($i);
@@ -33,7 +34,7 @@ class SurahController extends Controller
 
             if ($juzAyats && $juzAyats->isNotEmpty()) {
                 // Urutkan ayat secara matematis (Surah x 1000 + Ayat) untuk memastikan urutan mutlak
-                $juzAyats = $juzAyats->sortBy(function($ayat) {
+                $juzAyats = $juzAyats->sortBy(function ($ayat) {
                     return ($ayat->no_surah * 1000) + $ayat->nomorAyat;
                 })->values();
 
@@ -60,58 +61,64 @@ class SurahController extends Controller
         return view('all_surah', compact('surahs', 'juzData'));
     }
 
-    public function show($surahId)
+    public function show($id)
     {
-       try {
-            // Find surah by no_surah
-            $surah = Surah::where('no_surah', $surahId)->firstOrFail();
-            
-            // Get all ayats for this surah, ordered by ayat number
-            $ayats = Ayat::where('no_surah', $surahId)
-                        ->orderBy('nomorAyat', 'asc')
-                        ->get();
-            
-            // Get all surahs for the sidebar
-            $allSurahs = Surah::orderBy('no_surah', 'asc')->get();
-            
-            // Get previous surah
-            $prevSurah = Surah::where('no_surah', '<', $surahId)
-                              ->orderBy('no_surah', 'desc')
-                              ->first();
-            
-            // Get next surah
-            $nextSurah = Surah::where('no_surah', '>', $surahId)
-                              ->orderBy('no_surah', 'asc')
-                              ->first();
-            
-            // Get user bookmarks if authenticated
-            // $bookmarks = [];
-            // if (auth()->check()) {
-            //     $bookmarks = Bookmark::where('user_id', auth()->id())
-            //                          ->orderBy('created_at', 'desc')
-            //                          ->get();
-            
-            $audioArab = AudioArab::whereIn('ayat_id', $ayats->pluck('id'))->get();
-            $audioGorontalo = AudioGorontalo::whereIn('ayat_id', $ayats->pluck('id'))->get();
+        // 1. Ambil data Surah utama beserta ayat, footnote, dan audionya sekaligus
+        $surah = Surah::with([
+            'ayats.footnotes',
+            'ayats.audioArabs',
+            'ayats.audioGorontalos'
+        ])->where('no_surah', $id)->firstOrFail();
 
-            // Return the view with all data
-            return view('surah.show', compact(
-                'surah', 
-                'ayats', 
-                'allSurahs', 
-                'prevSurah', 
-                'nextSurah', 
-                'audioArab',
-                'audioGorontalo',
-                // 'bookmarks'
-            ));
-            
-        } catch (\Exception $e) {
-            Log::error('Error showing surah: ' . $e->getMessage());
-            return redirect()->route('mushaf')
-                           ->with('error', 'Surah tidak ditemukan');
-        }
+        // 2. Ambil semua surah untuk ditampilkan di menu sidebar
+        $allSurahs = Surah::orderBy('no_surah', 'asc')->get();
+
+        // 3. Ambil data Langgam yang HANYA relevan dengan surah ini
+        $langgams = Langgam::whereIn('id', function($query) use ($surah) {
+            $query->select('langgam_id')
+                  ->from('audio_arabs')
+                  ->join('ayats', 'ayats.id', '=', 'audio_arabs.ayat_id')
+                  ->where('ayats.no_surah', $surah->no_surah)
+                  ->whereNotNull('langgam_id');
+        })->get();
+
+        // 4. Ambil data Pelantun Gorontalo yang HANYA relevan dengan surah ini
+        $pembacaGorontalo = Pelantun::whereIn('id', function($query) use ($surah) {
+            $query->select('pembaca_gorontalo_id')
+                  ->from('audio_gorontalos')
+                  ->join('ayats', 'ayats.id', '=', 'audio_gorontalos.ayat_id')
+                  ->where('ayats.no_surah', $surah->no_surah);
+        })->get();
+
+        // 5. Ambil data Surah Sebelumnya (Prev) dan Selanjutnya (Next) untuk navigasi bawah
+        $prevSurah = Surah::where('no_surah', '<', $surah->no_surah)->orderBy('no_surah', 'desc')->first();
+        $nextSurah = Surah::where('no_surah', '>', $surah->no_surah)->orderBy('no_surah', 'asc')->first();
         
+        // 6. Masukkan daftar ayat ke variabel $ayats untuk dipakai di Blade
+        $ayats = $surah->ayats;
+
+        // 7. Ambil daftar Qari untuk default state (Opsional, tapi biar nggak error kalau qaris kosong di blade)
+        $qaris = Pelantun::select('id', 'nama')->get();
+
+        // Variabel default untuk dropdown agar tidak error Undefined Variable di Blade
+        $langgamId = request('langgam_id', '');
+        $qariId = request('qari_id', '');
+        $pembacaGorontaloId = request('pembaca_gorontalo_id', '');
+
+        // 8. Kirim semua variabel ke tampilan View
+        return view('surah.show', compact(
+            'surah', 
+            'ayats', 
+            'allSurahs', 
+            'prevSurah', 
+            'nextSurah', 
+            'langgams', 
+            'pembacaGorontalo',
+            'qaris',
+            'langgamId',
+            'qariId',
+            'pembacaGorontaloId'
+        ));
     }
 
     public function showJuz($juz_id)
@@ -123,9 +130,9 @@ class SurahController extends Controller
 
         // Ambil semua ayat di Juz ini, urutkan berdasarkan ID/Nomor urut mutlak, beserta data Surahnya
         $ayats = \App\Models\Ayat::with(['surah', 'audioArabs', 'audioGorontalos'])
-                    ->where('juz', $juz_id)
-                    ->orderBy('id', 'asc') // Asumsi ID tabel ayat lu urut dari Al-Fatihah 1 sampai An-Nas 6
-                    ->get();
+            ->where('juz', $juz_id)
+            ->orderBy('id', 'asc') // Asumsi ID tabel ayat lu urut dari Al-Fatihah 1 sampai An-Nas 6
+            ->get();
 
         if ($ayats->isEmpty()) {
             abort(404, 'Belum ada data ayat untuk Juz ini.');
@@ -136,6 +143,88 @@ class SurahController extends Controller
         $nextJuz = $juz_id < 30 ? $juz_id + 1 : null;
 
         return view('surah.juz', compact('ayats', 'juz_id', 'prevJuz', 'nextJuz'));
+    }
+
+    public function getAudioFilter(\Illuminate\Http\Request $request)
+    {
+        $surah_id = $request->surah_id;
+        $langgam_id = $request->langgam_id;
+        $qari_id = $request->qari_id;
+        $pembaca_gorontalo_id = $request->pembaca_gorontalo_id;
+
+        $response = [];
+
+        // ====================================================
+        // 1. CARI QARI BERDASARKAN LANGGAM & SURAH (ANTI-BUG)
+        // ====================================================
+        if ($request->has('langgam_id')) {
+            if ($langgam_id) {
+                // Langsung ngintip ke tabel audio_arabs, gak usah lewat relasi pivot!
+                $response['qaris'] = \App\Models\Pelantun::whereIn('id', function($query) use ($surah_id, $langgam_id) {
+                    $query->select('pelantun_id')
+                          ->from('audio_arabs')
+                          ->join('ayats', 'ayats.id', '=', 'audio_arabs.ayat_id')
+                          ->where('ayats.no_surah', $surah_id)
+                          ->where('audio_arabs.langgam_id', $langgam_id);
+                })->select('id', 'nama')->get();
+            } else {
+                $response['qaris'] = [];
+            }
+        }
+
+        // ====================================================
+        // 2. AMBIL AUDIO ARAB SESUAI QARI & LANGGAM
+        // ====================================================
+        if ($qari_id && $surah_id) {
+            $audioLinksArab = [];
+            $ayats = \App\Models\Ayat::where('no_surah', $surah_id)->get(['id', 'nomorAyat']);
+            
+            foreach ($ayats as $ayat) {
+                $audioQuery = \App\Models\AudioArab::where('ayat_id', $ayat->id)
+                                ->where('pelantun_id', $qari_id);
+                
+                // Pastikan audionya sesuai langgam yang dipilih
+                if ($langgam_id) {
+                    $audioQuery->where('langgam_id', $langgam_id);
+                }
+
+                $audio = $audioQuery->first();
+                
+                if ($audio) {
+                    // Sapu bersih kata 'public/' kalau nyangkut di database
+                    $cleanPath = preg_replace('/^public\//', '', $audio->file_path);
+                    $audioLinksArab[$ayat->nomorAyat] = asset('storage/' . ltrim($cleanPath, '/'));
+                } else {
+                    $audioLinksArab[$ayat->nomorAyat] = '';
+                }
+            }
+            $response['audioLinksArab'] = $audioLinksArab;
+        }
+
+        // ====================================================
+        // 3. AMBIL AUDIO GORONTALO
+        // ====================================================
+        if ($pembaca_gorontalo_id && $surah_id) {
+            $audioLinksGoro = [];
+            $ayats = \App\Models\Ayat::where('no_surah', $surah_id)->get(['id', 'nomorAyat']);
+            
+            foreach ($ayats as $ayat) {
+                $audio = \App\Models\AudioGorontalo::where('ayat_id', $ayat->id)
+                            ->where('pembaca_gorontalo_id', $pembaca_gorontalo_id)
+                            ->first();
+                            
+                if ($audio) {
+                    // Sapu bersih kata 'public/'
+                    $cleanPath = preg_replace('/^public\//', '', $audio->file_path);
+                    $audioLinksGoro[$ayat->nomorAyat] = asset('storage/' . ltrim($cleanPath, '/'));
+                } else {
+                    $audioLinksGoro[$ayat->nomorAyat] = '';
+                }
+            }
+            $response['audioLinksGoro'] = $audioLinksGoro;
+        }
+
+        return response()->json($response);
     }
 
     /**

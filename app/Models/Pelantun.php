@@ -13,13 +13,13 @@ class Pelantun extends Model
     // Relasi kalau dia jadi Qari (pembaca Arab) di potongan ayat
     public function ayatAudiosSebagaiQari(): HasMany
     {
-        return $this->hasMany(AyatAudio::class, 'qari_id');
+        return $this->hasMany(AudioArab::class, 'qari_id');
     }
 
     // Relasi kalau dia jadi Pembaca Terjemahan Gorontalo di potongan ayat
     public function ayatAudiosSebagaiPembaca(): HasMany
     {
-        return $this->hasMany(AyatAudio::class, 'pembaca_gorontalo_id');
+        return $this->hasMany(AudioGorontalo::class, 'pembaca_gorontalo_id');
     }
 
     // Relasi ke audio full surah

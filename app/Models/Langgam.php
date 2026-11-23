@@ -10,9 +10,14 @@ class Langgam extends Model
     protected $table = 'langgams';
     protected $fillable = ['nama', 'deskripsi'];
 
-    public function ayatAudios(): HasMany
+    public function ayatAudiosArab(): HasMany
     {
-        return $this->hasMany(AyatAudio::class, 'langgam_id');
+        return $this->hasMany(AudioArab::class, 'langgam_id');
+    }
+
+    public function ayatAudiosGorontalo(): HasMany
+    {
+        return $this->hasMany(AudioGorontalo::class, 'langgam_id');
     }
 
     public function surahAudios(): HasMany

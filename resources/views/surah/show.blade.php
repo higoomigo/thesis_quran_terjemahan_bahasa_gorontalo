@@ -5,79 +5,15 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Qur'an Gorontalo - {{ $surah->nama_latin ?? 'Baca' }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap"
         rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-fixed": "#a6f2d1",
-                        "surface": "#f9f9ff",
-                        "on-tertiary-container": "#a8d0bc",
-                        "on-secondary-fixed": "#331200",
-                        "tertiary": "#1e4334",
-                        "surface-bright": "#f9f9ff",
-                        "secondary-container": "#fd8a42",
-                        "error": "#ba1a1a",
-                        "tertiary-container": "#365a4a",
-                        "surface-tint": "#1b6b51",
-                        "on-tertiary-fixed": "#002115",
-                        "primary-fixed-dim": "#8bd6b6",
-                        "on-primary-fixed": "#002116",
-                        "inverse-surface": "#2a313d",
-                        "on-primary-container": "#8bd6b7",
-                        "on-background": "#151c27",
-                        "background": "#f9f9ff",
-                        "tertiary-fixed-dim": "#a8cfbc",
-                        "secondary": "#9b4500",
-                        "on-primary": "#ffffff",
-                        "surface-container-low": "#f0f3ff",
-                        "inverse-primary": "#8bd6b6",
-                        "on-secondary-container": "#682c00",
-                        "on-surface": "#151c27",
-                        "primary-container": "#065f46",
-                        "on-tertiary": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "surface-container-lowest": "#ffffff",
-                        "on-surface-variant": "#3f4944",
-                        "primary": "#004532",
-                        "surface-container-high": "#e2e8f8",
-                        "secondary-fixed": "#ffdbca",
-                        "on-error-container": "#93000a",
-                        "surface-container-highest": "#dce2f3",
-                        "on-secondary-fixed-variant": "#763300",
-                        "outline": "#6f7973",
-                        "on-primary-fixed-variant": "#00513b",
-                        "on-secondary": "#ffffff",
-                        "on-error": "#ffffff",
-                        "tertiary-fixed": "#c3ecd7",
-                        "surface-dim": "#d3daea",
-                        "surface-container": "#e7eefe",
-                        "inverse-on-surface": "#ebf1ff",
-                        "outline-variant": "#bec9c2",
-                        "surface-variant": "#dce2f3",
-                        "secondary-fixed-dim": "#ffb68e",
-                        "on-tertiary-fixed-variant": "#294e3f"
-                    },
-                    "fontFamily": {
-                        "label-md": ["Inter"],
-                        "caption": ["Inter"],
-                        "headline-lg": ["Inter"],
-                        "headline-xl": ["Inter"],
-                        "body-reading-translation": ["Inter"],
-                        "body-reading-arabic": ["Noto Serif"]
-                    }
-                }
-            }
-        }
-    </script>
+
+
     <style>
         body {
             background-color: #fafafa;
@@ -87,12 +23,9 @@
             transition: all 0.2s ease;
         }
 
-        /* .ayah-card:hover { background-color: rgba(0, 69, 50, 0.02); } */
-
         .arabic-text {
             font-family: 'Noto Serif', serif;
             font-size: 36px;
-            /* Ukuran pas untuk fokus */
             line-height: 2.2;
             direction: rtl;
             text-align: right;
@@ -101,7 +34,7 @@
 
         .translation-text {
             font-family: 'Inter', sans-serif;
-            font-size: 20px;;
+            font-size: 20px;
             line-height: 1.8;
             color: #334155;
         }
@@ -129,53 +62,47 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-    </style>
 
-    <style>
         #loading-screen {
             opacity: 1;
             visibility: visible;
             transition: opacity 0.4s ease, visibility 0.4s ease;
         }
+
         #loading-screen.hidden-loader {
             opacity: 0;
             visibility: hidden;
         }
     </style>
     @include('partials.pwa')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="text-on-surface antialiased min-h-screen flex flex-col relative overflow-x-hidden">
-    <div id="loading-screen" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#f9f9ff]">
+    <!-- Loading Screen -->
+    {{-- <div id="loading-screen" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#f9f9ff]">
         <div class="relative flex items-center justify-center">
-            <!-- Spinner Outer Ring -->
             <div class="w-16 h-16 border-4 border-emerald-200 border-t-emerald-900 rounded-full animate-spin"></div>
-            <!-- Icon Al-Qur'an di Tengah -->
-            
         </div>
-        <!-- Teks Khas Bahasa Gorontalo / Indonesia -->
-        <p class="mt-4 text-xs md:text-sm font-bold text-slate-600 tracking-wider uppercase animate-pulse">
-            Sabaripo...
-        </p>
-    </div>
-    <!-- 1. READING PROGRESS BAR (Tetap di atas layar) -->
+        <p class="mt-4 text-xs md:text-sm font-bold text-slate-600 tracking-wider uppercase animate-pulse">Sabaripo...</p>
+    </div> --}}
+    {{-- @dd($pembacaGorontalo) --}}
+    <!-- Progress Bar -->
     <div class="fixed top-0 left-0 w-full h-1.5 bg-gray-200 z-[100]">
         <div id="readingProgress" class="h-full bg-primary transition-all duration-150 ease-out" style="width: 0%;">
         </div>
     </div>
 
-    <!-- 2. SIDEBAR OFF-CANVAS (Tersembunyi by default) -->
+    <!-- Sidebar Off-Canvas -->
     <div id="sidebarBackdrop"
         class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-300">
     </div>
-
     <aside id="sidebarNav"
         class="fixed top-0 left-0 h-screen w-80 bg-white z-[70] transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-5 border-b border-gray-100 bg-primary flex justify-between items-center text-white">
             <div>
-                <h3 class="font-bold text-lg tracking-wide flex items-center gap-2">
-                    <span class="material-symbols-outlined">menu_book</span> Daftar Surah
-                </h3>
+                <h3 class="font-bold text-lg tracking-wide flex items-center gap-2"><span
+                        class="material-symbols-outlined">menu_book</span> Daftar Surah</h3>
                 <p class="text-xs text-primary-fixed opacity-90 mt-1">Lompat ke surah lain</p>
             </div>
             <button id="closeSidebarBtn"
@@ -183,7 +110,6 @@
                 <span class="material-symbols-outlined">close</span>
             </button>
         </div>
-
         <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1 bg-surface-bright">
             @foreach ($allSurahs ?? [] as $listSurah)
                 @php $nomorUrut = $loop->iteration; @endphp
@@ -192,8 +118,7 @@
                     <div class="flex items-center gap-4">
                         <div
                             class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                            {{ $nomorUrut }}
-                        </div>
+                            {{ $nomorUrut }}</div>
                         <div>
                             <p
                                 class="font-bold text-gray-800 {{ isset($surah) && $surah->no_surah == $listSurah->no_surah ? 'text-primary' : '' }}">
@@ -207,63 +132,50 @@
         </div>
     </aside>
 
-    <!-- 3. MAIN CANVAS (Area Fokus Membaca) -->
     <main class="flex-1 flex flex-col w-full relative z-10 pt-1.5">
 
-        <!-- Header Kontrol -->
+        <!-- HEADER KONTROL -->
         <header
             class="sticky top-1.5 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 px-4 sm:px-8 py-4 flex items-center justify-between shadow-sm transition-all">
             <div class="flex items-center gap-2 sm:gap-4">
-
-                {{-- Ganti route('home') sesuai dengan nama route beranda lu, misalnya url('/') atau route('mushaf') --}}
                 <a href="{{ url('/') }}"
                     class="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl text-primary font-bold transition-colors shadow-sm"
                     title="Kembali ke Beranda">
                     <span class="material-symbols-outlined">home</span>
-                    {{-- <span class="hidden md:block text-sm">Beranda</span> --}}
                 </a>
-
                 <button id="openSidebarBtn"
                     class="flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-surface-container-low hover:bg-surface-container border border-gray-200 rounded-xl text-primary font-bold transition-colors shadow-sm">
                     <span class="material-symbols-outlined">format_list_bulleted</span>
                     <span class="hidden sm:block text-sm">Daftar Surah</span>
                 </button>
-
                 <div class="h-8 w-px bg-gray-300 hidden lg:block"></div>
-
                 <div class="hidden lg:block">
                     <h1 class="text-xl font-bold text-gray-900 leading-tight">QS
-                        {{ $surah->nama_latin ?? 'Al-Fatihah' }}</h1>
+                        {{ $surah->nama_latin ?? 'Nama Surah' }}</h1>
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest">
-                        {{ $surah->arti ?? 'Pembukaan' }}</p>
+                        {{ $surah->arti ?? 'Arti Surah' }}</p>
                 </div>
             </div>
 
+            <!-- Tombol Pengaturan & Play All -->
             <div class="flex items-center gap-1.5 sm:gap-2 bg-gray-50 p-1.5 rounded-xl border border-gray-200">
-                <button id="fontDecrease"
+                <button onclick="toggleSettingsModal()"
                     class="w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition-all"
-                    title="Perkecil Teks">
-                    <span class="material-symbols-outlined">text_decrease</span>
-                </button>
-                <div class="h-5 w-px bg-gray-300"></div>
-                <button id="fontIncrease"
-                    class="w-10 h-10 rounded-lg flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm transition-all"
-                    title="Perbesar Teks">
-                    <span class="material-symbols-outlined">text_increase</span>
+                    title="Pengaturan Tampilan">
+                    <span class="material-symbols-outlined">tune</span>
                 </button>
                 <div class="h-5 w-px bg-gray-300"></div>
                 <button id="btnPlayAll" onclick="togglePlayAll()"
                     class="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-700 text-white shadow-sm hover:bg-emerald-800 transition-all"
-                    title="Putar Seluruh Ayat (Arab & Gorontalo)">
+                    title="Putar Seluruh Ayat">
                     <span class="material-symbols-outlined icon-play-all">play_arrow</span>
                 </button>
             </div>
         </header>
 
-        <!-- Area Teks Ayat (Centered max-w-4xl untuk fokus) -->
+        <!-- AREA TEKS AYAT -->
         <div class="w-full max-w-5xl mx-auto px-6 py-12 flex flex-col gap-8" id="readingContainer">
 
-            <!-- Bismillah Header -->
             @if (($surah->no_surah ?? 1) != 1 && ($surah->no_surah ?? 1) != 9)
                 <div class="flex justify-center mb-10 pb-10 border-b border-gray-200">
                     <div class="text-center">
@@ -274,13 +186,10 @@
                 </div>
             @endif
 
-            <!-- Loop Ayats -->
-            <!-- Loop Ayats -->
             @forelse($ayats ?? [] as $ayat)
                 <div class="ayah-card flex flex-col gap-5 group border-b border-gray-300 pb-8 relative scroll-mt-32"
                     id="ayat-{{ $ayat->nomorAyat }}">
 
-                    <!-- Header Ayat -->
                     <div class="flex items-center justify-between w-full">
                         <span
                             class="px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-800 font-bold text-sm border border-emerald-100">
@@ -288,7 +197,6 @@
                         </span>
                     </div>
 
-                    <!-- Teks Arab -->
                     <div class="w-full flex justify-end">
                         <p class="arabic-text max-w-4xl">
                             {{ $ayat->Arab }}
@@ -300,63 +208,58 @@
                         </p>
                     </div>
 
-                    <!-- Terjemahan & 3 Tombol Aksi -->
-                    <div class="w-full bg-white rounded-2xl p-6  flex flex-col gap-4">
-                        <!-- Teks Terjemahan -->
-                        <p class="translation-text font-normal">
-                            {{ $ayat->teks_gorontalo }}
+                    <!-- Target Class untuk Teks & Tombol (Supaya bisa di-hide via JS) -->
+                    <div class="w-full bg-white rounded-2xl p-6 flex flex-col gap-4">
+                        <p class="translation-text target-goro font-normal text-primary">{{ $ayat->teks_gorontalo }}
                         </p>
-                        <p class="translation-text-indo font-light">
-                            {{ $ayat->teksIndo }}
+                        <p class="translation-text-indo target-indo font-light text-gray-600">
+                            {!! $ayat->formatted_teks_indo !!}
                         </p>
 
-                        <!-- Garis Pembatas -->
                         <div class="h-px w-full bg-gray-100"></div>
 
-                        <!-- Dengarkan, Salin, Riwayat & Usulan -->
-                        <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-                            <!-- Tombol Play Audio -->
-                            <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-                                {{-- Tombol Arab --}}
-                                @php
-                                    $audioArab = $ayat->audioArabs->first(); // atau filter berdasarkan langgam/qari tertentu
-                                @endphp
-                                <button
-                                    onclick="playAudio(this)"
-                                    data-src="{{ $audioArab ? asset('storage/' . $audioArab->file_path) : '' }}"
-                                    class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm {{ !$audioArab ? 'opacity-40 cursor-not-allowed' : '' }}"
-                                    {{ !$audioArab ? 'disabled' : '' }}>
+                        <!-- Target Audio Container -->
+                        <div class="flex flex-wrap items-center gap-x-6 gap-y-3 target-audio">
+                            @php
+                                $audioArab = $ayat->audioArabs->first();
+                                $audioGto = $ayat->audioGorontalos->first();
+                                $arabUrl = $audioArab?->file_path
+                                    ? asset('storage/' . ltrim($audioArab->file_path, '/'))
+                                    : '';
+                                $gorUrl = $audioGto?->file_path
+                                    ? asset('storage/' . ltrim($audioGto->file_path, '/'))
+                                    : '';
+                            @endphp
+
+                            <!-- Container dengan data-ayat buat target update AJAX -->
+                            <div class="flex flex-wrap items-center gap-x-6 gap-y-3 audio-buttons-container"
+                                data-ayat="{{ $ayat->nomorAyat }}">
+                                <button type="button" onclick="playAudio('{{ $arabUrl }}', this)"
+                                    data-text="Arab" data-icon="play_circle" data-audio-url="{{ $arabUrl }}"
+                                    class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm {{ $arabUrl ? '' : 'opacity-40 cursor-not-allowed' }}">
                                     <span class="material-symbols-outlined text-[20px] icon-play">play_circle</span>
                                     <span class="text-play">Arab</span>
                                 </button>
 
-                                {{-- Tombol Gorontalo --}}
-                                @php
-                                    $audioGto = $ayat->audioGorontalos->first();
-                                @endphp
-                                <button
-                                    onclick="playAudio(this)"
-                                    data-src="{{ $audioGto ? asset('storage/' . $audioGto->file_path) : '' }}"
-                                    class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm {{ !$audioGto ? 'opacity-40 cursor-not-allowed' : '' }}"
-                                    {{ !$audioGto ? 'disabled' : '' }}>
-                                    <span class="material-symbols-outlined text-[20px] icon-play">record_voice_over</span>
+                                <button type="button" onclick="playAudio('{{ $gorUrl }}', this)"
+                                    data-text="Gorontalo" data-icon="record_voice_over"
+                                    data-audio-url="{{ $gorUrl }}"
+                                    class="audio-btn text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm {{ $gorUrl ? '' : 'opacity-40 cursor-not-allowed' }}">
+                                    <span
+                                        class="material-symbols-outlined text-[20px] icon-play">record_voice_over</span>
                                     <span class="text-play">Gorontalo</span>
                                 </button>
                             </div>
 
-                            <!-- Tombol Salin -->
-                            <button
-                                onclick="copyAyat({{ $ayat->nomorAyat }}, '{{ addslashes($ayat->Arab) }}', '{{ addslashes($ayat->teks_gorontalo) }}')"
-                                class="text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm">
-                                <span class="material-symbols-outlined text-[20px]">content_copy</span>
-                                Salin
+                            <button type="button"
+                                onclick="copyAyat({{ $ayat->nomorAyat }}, `{{ addslashes($ayat->Arab) }}`, `{{ addslashes($ayat->teks_gorontalo) }}`)"
+                                class="text-gray-500 hover:text-emerald-600 transition-colors flex items-center gap-1.5 font-bold text-sm ml-4 border-l border-gray-200 pl-4">
+                                <span class="material-symbols-outlined text-[20px]">content_copy</span> Salin
                             </button>
 
-                            <!-- Tombol Riwayat & Usulan -->
                             <a href="{{ route('usulan.index', ['surah_id' => $surah->no_surah, 'ayat_id' => $ayat->nomorAyat]) }}"
                                 class="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-1.5 font-bold text-sm sm:ml-auto">
-                                <span class="material-symbols-outlined text-[20px]">history_edu</span>
-                                Riwayat & Usulan
+                                <span class="material-symbols-outlined text-[20px]">history_edu</span> Histori Usulan
                             </a>
                         </div>
                     </div>
@@ -388,14 +291,295 @@
                     <div></div>
                 @endif
             </div>
-
+            {{-- @dd($pembacaGorontalo) --}}
         </div>
     </main>
 
+    <!-- Modal Backdrop -->
+    <div id="settingsBackdrop" onclick="toggleSettingsModal()"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[80] opacity-0 pointer-events-none transition-opacity duration-300">
+    </div>
+
+    <!-- Bottom Sheet Modal Pengaturan -->
+    <!-- MODAL PENGATURAN BACAAN (UNIVERSAL DESIGN - MODERN & ACCESSIBLE) -->
+    <div id="settingsModal"
+        class="fixed bottom-0 left-0 w-full bg-white rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-[90] transform translate-y-full transition-transform duration-500 max-h-[85vh] overflow-y-auto custom-scrollbar font-sans">
+
+        <!-- Handle Bar (Garis penarik di atas modal) -->
+        <div
+            class="sticky top-0 bg-white/90 backdrop-blur-sm z-20 pt-4 pb-2 px-6 flex flex-col items-center justify-center border-b border-gray-100">
+            <div class="w-14 h-1.5 bg-gray-200 rounded-full mb-4"></div>
+            <div class="w-full flex justify-between items-center">
+                <h3 class="text-2xl font-extrabold text-gray-800 tracking-tight">Pengaturan</h3>
+                <button onclick="toggleSettingsModal()"
+                    class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-md mx-auto px-6 py-6 flex flex-col gap-8 relative">
+
+            <!-- ========================================== -->
+            <!-- SEGMEN 1: PENGATURAN AUDIO (KARTU MODERN)  -->
+            <!-- ========================================== -->
+            <div class="flex flex-col gap-4">
+                <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Sumber Audio</h4>
+
+                {{-- KONDISI 1: JIKA AUDIO SAMA SEKALI KOSONG --}}
+                @if ($langgams->isEmpty() && $pembacaGorontalo->isEmpty())
+                    <div
+                        class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-100/50 shadow-sm flex gap-4 items-start">
+                        <div
+                            class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0 text-orange-500">
+                            <span class="material-symbols-outlined text-2xl">hourglass_empty</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800 text-lg">Audio Sedang Disiapkan</p>
+                            <p class="text-gray-500 text-sm mt-1 leading-relaxed">Rekaman murottal untuk surah ini
+                                belum tersedia dan sedang dalam proses.</p>
+                        </div>
+                    </div>
+                @else
+                    {{-- KONDISI 2: AUDIO ARAB --}}
+                    @if ($langgams->isNotEmpty())
+                        <div
+                            class="bg-white rounded-3xl p-5 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_25px_rgba(0,0,0,0.06)] transition-shadow">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <span class="material-symbols-outlined text-xl">queue_music</span>
+                                </div>
+                                <h3 class="font-bold text-gray-800 text-lg">Murottal Arab</h3>
+                            </div>
+
+                            <div class="flex flex-col gap-4">
+                                <!-- Irama -->
+                                <div class="relative">
+                                    <select id="langgamSelect"
+                                        class="w-full appearance-none rounded-2xl border border-gray-200 text-base py-3.5 pl-4 pr-10 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 bg-gray-50/50 hover:bg-gray-50 cursor-pointer font-medium text-gray-700 transition-all">
+                                        <option value="">Pilih Irama...</option>
+                                        @foreach ($langgams as $langgam)
+                                            <option value="{{ $langgam->id }}">{{ $langgam->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span
+                                        class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                                </div>
+
+                                <!-- Qari -->
+                                <div class="relative">
+                                    <select id="qariSelect" disabled
+                                        style="background-color: #f9fafb; color: #9ca3af; cursor: not-allowed;"
+                                        class="w-full appearance-none rounded-2xl border border-gray-200 text-base py-3.5 pl-4 pr-10 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 font-medium transition-all duration-300">
+                                        <option value="">Pilih Irama dahulu ↑</option>
+                                    </select>
+                                    <span
+                                        class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none"
+                                        id="qariIcon">lock</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- KONDISI 3: AUDIO GORONTALO --}}
+                    @if ($pembacaGorontalo->isNotEmpty())
+                        <div
+                            class="bg-white rounded-3xl p-5 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_25px_rgba(0,0,0,0.06)] transition-shadow">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                    <span class="material-symbols-outlined text-xl">translate</span>
+                                </div>
+                                <h3 class="font-bold text-gray-800 text-lg">Terjemahan Hulontalo</h3>
+                            </div>
+
+                            <div class="relative">
+                                <select id="pembacaGoroSelect"
+                                    class="w-full appearance-none rounded-2xl border border-gray-200 text-base py-3.5 pl-4 pr-10 focus:ring-4 focus:ring-emerald-50 focus:border-emerald-500 bg-gray-50/50 hover:bg-gray-50 cursor-pointer font-medium text-gray-700 transition-all">
+                                    <option value="">Pilih Pelantun...</option>
+                                    @foreach ($pembacaGorontalo as $p)
+                                        <option value="{{ $p->id }}">{{ $p->nama }}</option>
+                                    @endforeach
+                                </select>
+                                <span
+                                    class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+                    @endif
+
+                @endif
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SEGMEN 2: PENGATURAN TAMPILAN TEKS         -->
+            <!-- ========================================== -->
+            <div class="flex flex-col gap-4">
+                <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Ukuran Teks</h4>
+
+                <div
+                    class="bg-white rounded-3xl p-2 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] divide-y divide-gray-50">
+
+                    <!-- Font Arab -->
+                    <div class="flex justify-between items-center p-4">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500">
+                                <span class="material-symbols-outlined text-xl">text_format</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800">Teks Arab</p>
+                                <p class="text-xs text-gray-400">Sesuaikan huruf</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 bg-gray-50 rounded-2xl p-1">
+                            <button id="fontDecreaseArab"
+                                class="w-10 h-10 rounded-xl bg-white shadow-sm text-gray-600 flex items-center justify-center hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-95"><span
+                                    class="material-symbols-outlined text-lg">remove</span></button>
+                            <span class="text-sm font-bold w-6 text-center text-gray-700">Aa</span>
+                            <button id="fontIncreaseArab"
+                                class="w-10 h-10 rounded-xl bg-white shadow-sm text-gray-600 flex items-center justify-center hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-95"><span
+                                    class="material-symbols-outlined text-lg">add</span></button>
+                        </div>
+                    </div>
+
+                    <!-- Font Terjemahan -->
+                    <div class="flex justify-between items-center p-4">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500">
+                                <span class="material-symbols-outlined text-xl">subtitles</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800">Terjemahan</p>
+                                <p class="text-xs text-gray-400">Sesuaikan huruf</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 bg-gray-50 rounded-2xl p-1">
+                            <button id="fontDecreaseTrans"
+                                class="w-10 h-10 rounded-xl bg-white shadow-sm text-gray-600 flex items-center justify-center hover:text-emerald-600 hover:bg-emerald-50 transition-all active:scale-95"><span
+                                    class="material-symbols-outlined text-lg">remove</span></button>
+                            <span class="text-sm font-bold w-6 text-center text-gray-700">Aa</span>
+                            <button id="fontIncreaseTrans"
+                                class="w-10 h-10 rounded-xl bg-white shadow-sm text-gray-600 flex items-center justify-center hover:text-emerald-600 hover:bg-emerald-50 transition-all active:scale-95"><span
+                                    class="material-symbols-outlined text-lg">add</span></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SEGMEN 3: VISIBILITAS (TOGGLE SWITCH)      -->
+            <!-- ========================================== -->
+            <div class="flex flex-col gap-4">
+                <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Tampilan Layar</h4>
+
+                <div
+                    class="bg-white rounded-3xl p-2 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] divide-y divide-gray-50 mb-8">
+
+                    <!-- Toggle Gorontalo -->
+                    <div class="flex justify-between items-center p-4">
+                        <div class="pr-4">
+                            <p class="font-bold text-gray-800">Bahasa Hulontalo</p>
+                            <p class="text-xs text-gray-400">Tampilkan teks lokal</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleGoro" class="sr-only peer" checked>
+                            <div
+                                class="w-14 h-8 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500 shadow-inner">
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Toggle Indonesia -->
+                    <div class="flex justify-between items-center p-4">
+                        <div class="pr-4">
+                            <p class="font-bold text-gray-800">Bahasa Indonesia</p>
+                            <p class="text-xs text-gray-400">Tampilkan teks nasional</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleIndo" class="sr-only peer" checked>
+                            <div
+                                class="w-14 h-8 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-500 shadow-inner">
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Toggle Audio -->
+                    <div class="flex justify-between items-center p-4">
+                        <div class="pr-4">
+                            <p class="font-bold text-gray-800">Pemutar Audio</p>
+                            <p class="text-xs text-gray-400">Tombol putar tiap ayat</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleAudioBtn" class="sr-only peer" checked>
+                            <div
+                                class="w-14 h-8 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-500 shadow-inner">
+                            </div>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL CATATAN KAKI (RAMAH LANSIA) -->
+    <!-- MODAL CATATAN KAKI (RAMAH LANSIA + KONTEKS AYAT) -->
+    <div id="footnoteModal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white w-full max-w-lg rounded-[28px] shadow-2xl overflow-hidden animate-fade-in">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-emerald-50/50">
+                <div class="flex items-center gap-3">
+                    <span id="fnModalNomor"
+                        class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-extrabold text-sm shadow-sm">1</span>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-gray-800 leading-tight">Catatan Kaki</h3>
+                        <p id="fnModalAyat" class="text-xs font-semibold text-emerald-700">Ayat 1</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeFootnoteModal()"
+                    class="w-10 h-10 rounded-full bg-white text-gray-500 hover:bg-red-50 hover:text-red-500 flex items-center justify-center transition-colors shadow-sm">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-6 max-h-[65vh] overflow-y-auto space-y-5">
+                <!-- Kotak Terjemahan Bahasa Indonesia -->
+                <div class="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-4">
+                    <span class="block text-[11px] font-bold uppercase tracking-wider text-emerald-700 mb-1.5">
+                        Terjemahan Bahasa Indonesia
+                    </span>
+                    <p id="fnModalTerjemahan" class="text-gray-800 text-base leading-relaxed italic font-normal"></p>
+                </div>
+
+                <!-- Penjelasan Catatan Kaki -->
+                <div>
+                    <span class="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                        Penjelasan
+                    </span>
+                    <p id="fnModalIsi" class="text-gray-700 text-base text-justify sm:text-lg leading-relaxed font-normal"></p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button type="button" onclick="closeFootnoteModal()"
+                    class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base transition-all active:scale-95">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Audio Player -->
     <div id="globalAudioPlayer"
         class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] z-50 transform translate-y-full transition-transform duration-300 flex justify-center">
         <div class="max-w-4xl w-full px-4 sm:px-6 md:px-8 py-4 flex flex-col gap-2">
-
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-3 min-w-0">
                     <div id="playerIconBg"
@@ -408,33 +592,26 @@
                         <p id="playerSubtitle" class="text-xs text-slate-500 truncate">Mode Putar Otomatis</p>
                     </div>
                 </div>
-
                 <button onclick="closeGlobalPlayer()"
                     class="text-slate-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-
             <div class="flex items-center gap-3">
                 <span id="currentTimeDisplay" class="text-xs font-medium text-slate-500 w-10 text-right">00:00</span>
-
                 <input type="range" id="audioSeeker" min="0" max="100" value="0"
                     class="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-
                 <span id="totalTimeDisplay" class="text-xs font-medium text-slate-500 w-10">00:00</span>
             </div>
-
             <div class="flex justify-center items-center gap-6">
                 <button onclick="prevTrack()"
                     class="text-slate-500 hover:text-emerald-700 transition-colors active:scale-95">
                     <span class="material-symbols-outlined text-3xl">skip_previous</span>
                 </button>
-
                 <button id="mainPlayPauseBtn" onclick="togglePlayAll()"
                     class="text-emerald-700 hover:text-emerald-800 transition-colors active:scale-95">
                     <span class="material-symbols-outlined text-5xl">pause_circle</span>
                 </button>
-
                 <button onclick="nextTrack()"
                     class="text-slate-500 hover:text-emerald-700 transition-colors active:scale-95">
                     <span class="material-symbols-outlined text-3xl">skip_next</span>
@@ -443,405 +620,14 @@
         </div>
     </div>
 
+    <!-- Injeksi Variabel PHP ke JS -->
     <script>
-        window.addEventListener('load', function() {
-            const loader = document.getElementById('loading-screen');
-            if (loader) {
-                // Tambahkan efek fade-out
-                loader.classList.add('hidden-loader');
-
-                // Hilangkan dari DOM total setelah transisi 400ms selesai
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 400);
-            }
-        });
-    </script>
-
-    <script>
-        // --- LOGIKA PROGRESS BAR BACAAN ---
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('readingProgress').style.width = scrolled + '%';
-        });
-
-        // --- LOGIKA SIDEBAR OFF-CANVAS ---
-        const sidebar = document.getElementById('sidebarNav');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        const openBtn = document.getElementById('openSidebarBtn');
-        const closeBtn = document.getElementById('closeSidebarBtn');
-
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            backdrop.classList.remove('opacity-0', 'pointer-events-none');
-            document.body.style.overflow = 'hidden'; // Kunci scroll layar utama
-        }
-
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            backdrop.classList.add('opacity-0', 'pointer-events-none');
-            document.body.style.overflow = 'auto'; // Buka scroll layar utama
-        }
-
-        openBtn.addEventListener('click', openSidebar);
-        closeBtn.addEventListener('click', closeSidebar);
-        backdrop.addEventListener('click', closeSidebar); // Tutup kalau klik area gelap
-
-        // --- LOGIKA KONTROL UKURAN FONT ---
-        let currentFontSizeArab = 36;
-        let currentFontSizeTrans = 18;
-        const arabicTexts = document.querySelectorAll('.arabic-text');
-        const translationTexts = document.querySelectorAll('.translation-text');
-        const translationTextsIndo = document.querySelectorAll('.translation-text-indo');
-
-        document.getElementById('fontIncrease')?.addEventListener('click', () => {
-            if (currentFontSizeArab < 56) { // Maksimal ukuran
-                currentFontSizeArab += 2;
-                currentFontSizeTrans += 1;
-                arabicTexts.forEach(text => text.style.fontSize = currentFontSizeArab + 'px');
-                translationTexts.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
-                translationTextsIndo.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
-            }
-        });
-
-        document.getElementById('fontDecrease')?.addEventListener('click', () => {
-            if (currentFontSizeArab > 24) { // Minimal ukuran
-                currentFontSizeArab -= 2;
-                currentFontSizeTrans -= 1;
-                arabicTexts.forEach(text => text.style.fontSize = currentFontSizeArab + 'px');
-                translationTexts.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
-                translationTextsIndo.forEach(text => text.style.fontSize = currentFontSizeTrans + 'px');
-            }
-        });
-
-        // --- FUNGSI COPY ---
-        function copyAyat(ayatNumber, arabic, translation) {
-            const textToCopy = `Ayat ${ayatNumber}\n${arabic}\n\n${translation}\n\n(Qur'an Gorontalo)`;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('Teks ayat berhasil disalin!');
-            });
-        }
-    </script>
-
-    {{-- <script>
-        // Variabel global buat nyimpen data audio yang lagi jalan
-        let currentAudio = null;
-        let currentButton = null;
-
-        function playAudio(surahNo, ayatNo, type, btnElement) {
-            // Rangkai URL file audionya otomatis
-            const audioUrl = `/storage/audio_${type}/${surahNo}_${ayatNo}.mp3`;
-
-            const iconSpan = btnElement.querySelector('.icon-play');
-            const textSpan = btnElement.querySelector('.text-play');
-
-            // Skenario 1: Kalau tombol yang SAMA diklik lagi (buat Pause/Play lanjut)
-            if (currentAudio && currentAudio.src.includes(audioUrl)) {
-                if (!currentAudio.paused) {
-                    currentAudio.pause();
-                    setButtonState(btnElement, 'pause'); // Ubah UI ke state Jeda
-                } else {
-                    currentAudio.play();
-                    setButtonState(btnElement, 'play'); // Ubah UI ke state Jalan
-                }
-                return;
-            }
-
-            // Skenario 2: Kalau audio LAIN lagi jalan, matiin dulu audio yang lama
-            if (currentAudio) {
-                currentAudio.pause();
-                // Kembalikan tombol yang sebelumnya aktif ke wujud aslinya
-                if (currentButton && currentButton !== btnElement) {
-                    resetButtonState(currentButton);
-                }
-            }
-
-            // Skenario 3: Bikin pemutar baru dan langsung mainkan
-            currentAudio = new Audio(audioUrl);
-            currentButton = btnElement;
-
-            // Tampilkan animasi loading selagi ngambil file (Aman dari null)
-            if (iconSpan) {
-                iconSpan.innerHTML = 'hourglass_empty';
-                iconSpan.classList.add('animate-spin');
-            }
-            if (textSpan) {
-                textSpan.innerHTML = 'Memuat...';
-            }
-
-            // Jalankan audio
-            currentAudio.play().then(() => {
-                setButtonState(btnElement, 'play');
-            }).catch(error => {
-                console.error("Audio tidak ditemukan:", error);
-                const namaAudio = type === 'gorontalo' ? 'Terjemahan Gorontalo' : 'Murottal Arab';
-                alert(`Mohon maaf, file audio ${namaAudio} untuk ayat ini belum tersedia.`);
-
-                // Kalau gagal, langsung balikin tombol seperti semula
-                resetButtonState(btnElement);
-                currentAudio = null;
-                currentButton = null;
-            });
-
-            // Kalau audio udah selesai diputar sampai habis
-            currentAudio.onended = () => {
-                resetButtonState(btnElement);
-                currentAudio = null;
-                currentButton = null;
-            };
-        }
-
-        // --- FUNGSI BANTUAN UI (Matang & Anti Bug) ---
-        function setButtonState(btn, state) {
-            if (!btn) return;
-            const iconSpan = btn.querySelector('.icon-play');
-            const textSpan = btn.querySelector('.text-play');
-
-            if (iconSpan) iconSpan.classList.remove('animate-spin');
-
-            if (state === 'play') {
-                btn.classList.add('text-emerald-600');
-                if (iconSpan) iconSpan.innerHTML = 'pause_circle';
-                if (textSpan) textSpan.innerHTML = 'Jeda';
-            } else if (state === 'pause') {
-                btn.classList.remove('text-emerald-600');
-                if (iconSpan) iconSpan.innerHTML = 'play_circle';
-                if (textSpan) textSpan.innerHTML = 'Lanjutkan';
-            }
-        }
-
-        function resetButtonState(btn) {
-            if (!btn) return;
-            const iconSpan = btn.querySelector('.icon-play');
-            const textSpan = btn.querySelector('.text-play');
-
-            // JARING PENGAMAN: Kalau data-icon/text lupa ditulis di HTML, pakai nilai default ini
-            const defaultIcon = btn.getAttribute('data-icon') || 'play_circle';
-            const defaultText = btn.getAttribute('data-text') || 'Dengarkan';
-
-            btn.classList.remove('text-emerald-600');
-
-            if (iconSpan) {
-                iconSpan.classList.remove('animate-spin');
-                iconSpan.innerHTML = defaultIcon;
-            }
-
-            if (textSpan) {
-                textSpan.innerHTML = defaultText;
-            }
-        }
-    </script> --}}
-
-    <script>
-        let currentAudio = null;
-        let currentBtn = null;
-
-        function playAudio(btn) {
-            const src = btn.dataset.src;
-
-            if (!src) {
-                alert('Audio belum tersedia');
-                return;
-            }
-
-            // Kalau lagi main di tombol yang sama → pause
-            if (currentBtn === btn && currentAudio && !currentAudio.paused) {
-                currentAudio.pause();
-                resetButton(btn);
-                return;
-            }
-
-            // Stop audio sebelumnya
-            if (currentAudio) {
-                currentAudio.pause();
-                if (currentBtn) resetButton(currentBtn);
-            }
-
-            // Mainkan yang baru
-            currentAudio = new Audio(src);
-            currentBtn = btn;
-
-            btn.querySelector('.icon-play').textContent = 'pause_circle';
-            btn.querySelector('.text-play').textContent = 'Pause';
-
-            currentAudio.play();
-
-            currentAudio.onended = () => {
-                resetButton(btn);
-                currentAudio = null;
-                currentBtn = null;
-            };
-        }
-
-        function resetButton(btn) {
-            const isArab = btn.querySelector('.text-play').textContent.toLowerCase().includes('arab') || 
-                        btn.querySelector('.icon-play').textContent.includes('play_circle');
-            
-            btn.querySelector('.icon-play').textContent = isArab ? 'play_circle' : 'record_voice_over';
-            btn.querySelector('.text-play').textContent = isArab ? 'Arab' : 'Gorontalo';
-        }
-    </script>
-
-    <script>
-        // Injeksi data dari PHP
         const G_SURAH_NO = {{ $surah->no_surah ?? 1 }};
-        const G_TOTAL_AYAT = {{ count($ayats) }}; // Pastikan variabel array ayat lu namanya $ayahs
-
-        // State Global Player
-        let playlist = [];
-        let currentIndex = 0;
-        let isGlobalPlaying = false;
-        let globalAudio = new Audio();
-
-        // Referensi Elemen UI
-        const globalPlayerUI = document.getElementById('globalAudioPlayer');
-        const headerBtnIcon = document.querySelector('.icon-play-all');
-        const mainPlayPauseBtn = document.getElementById('mainPlayPauseBtn');
-        const playerTitle = document.getElementById('playerTitle');
-        const audioSeeker = document.getElementById('audioSeeker');
-        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
-        const totalTimeDisplay = document.getElementById('totalTimeDisplay');
-
-        // 1. Buat Playlist (Arab 1 -> Gorontalo 1 -> Arab 2 -> Gorontalo 2)
-        function buildPlaylist() {
-            playlist = [];
-            for (let i = 1; i <= G_TOTAL_AYAT; i++) {
-                playlist.push({
-                    type: 'murottal',
-                    ayat: i,
-                    label: 'Murottal Arab'
-                });
-                playlist.push({
-                    type: 'gorontalo',
-                    ayat: i,
-                    label: 'Terjemahan Gorontalo'
-                });
-            }
-        }
-
-        // 2. Fungsi Eksekusi Trek
-        function loadAndPlayTrack(index) {
-            if (index < 0 || index >= playlist.length) {
-                closeGlobalPlayer(); // Kalo udah habis, tutup
-                return;
-            }
-
-            currentIndex = index;
-            const track = playlist[currentIndex];
-            const audioUrl = `/storage/audio_${track.type}/${G_SURAH_NO}_${track.ayat}.mp3`;
-
-            // Update UI Text
-            playerTitle.innerHTML = `Ayat ${track.ayat} - ${track.label}`;
-            audioSeeker.value = 0;
-            currentTimeDisplay.innerHTML = "00:00";
-            totalTimeDisplay.innerHTML = "00:00";
-
-            globalAudio.src = audioUrl;
-
-            // Coba putar
-            globalAudio.play().then(() => {
-                isGlobalPlaying = true;
-                updatePlayPauseUI(true);
-
-                // JIKA ADA AUDIO INDIVIDU YANG LAGI JALAN, MATIIN DULU!
-                if (typeof currentAudio !== 'undefined' && currentAudio) {
-                    currentAudio.pause();
-                    if (typeof currentButton !== 'undefined') resetButtonState(currentButton);
-                }
-            }).catch(err => {
-                console.warn(`File ${audioUrl} tidak ditemukan. Otomatis skip ke trek selanjutnya...`);
-                // Kalo file ga ada, skip otomatis setelah 1 detik
-                setTimeout(() => {
-                    nextTrack();
-                }, 1000);
-            });
-        }
-
-        // 3. Tombol Utama (Play/Pause)
-        function togglePlayAll() {
-            if (playlist.length === 0) buildPlaylist();
-
-            // Tampilkan panel bawah
-            globalPlayerUI.classList.remove('translate-y-full');
-
-            if (isGlobalPlaying) {
-                globalAudio.pause();
-                isGlobalPlaying = false;
-                updatePlayPauseUI(false);
-            } else {
-                if (globalAudio.src) {
-                    globalAudio.play();
-                } else {
-                    loadAndPlayTrack(currentIndex);
-                }
-                isGlobalPlaying = true;
-                updatePlayPauseUI(true);
-            }
-        }
-
-        function updatePlayPauseUI(playing) {
-            if (playing) {
-                headerBtnIcon.innerHTML = 'pause';
-                mainPlayPauseBtn.innerHTML = '<span class="material-symbols-outlined text-5xl">pause_circle</span>';
-            } else {
-                headerBtnIcon.innerHTML = 'play_arrow';
-                mainPlayPauseBtn.innerHTML = '<span class="material-symbols-outlined text-5xl">play_circle</span>';
-            }
-        }
-
-        // 4. Next & Prev Track
-        function nextTrack() {
-            loadAndPlayTrack(currentIndex + 1);
-        }
-
-        function prevTrack() {
-            loadAndPlayTrack(currentIndex - 1);
-        }
-
-        // 5. Tutup Panel
-        function closeGlobalPlayer() {
-            globalAudio.pause();
-            isGlobalPlaying = false;
-            updatePlayPauseUI(false);
-            globalPlayerUI.classList.add('translate-y-full');
-        }
-
-        // ==========================================
-        // LOGIKA PROGRESS BAR (SEEK & TIME UPDATE)
-        // ==========================================
-
-        // Tiap kali durasi jalan, update slider & text
-        globalAudio.addEventListener('timeupdate', () => {
-            if (!isNaN(globalAudio.duration)) {
-                const progressPercent = (globalAudio.currentTime / globalAudio.duration) * 100;
-                audioSeeker.value = progressPercent;
-                currentTimeDisplay.innerHTML = formatTime(globalAudio.currentTime);
-                totalTimeDisplay.innerHTML = formatTime(globalAudio.duration);
-            }
-        });
-
-        // Otomatis lanjut ke trek selanjutnya kalau audio udah abis
-        globalAudio.addEventListener('ended', () => {
-            nextTrack();
-        });
-
-        // Kalo user geser slider, ganti posisi audionya
-        audioSeeker.addEventListener('input', (e) => {
-            if (!isNaN(globalAudio.duration)) {
-                const seekTo = (e.target.value / 100) * globalAudio.duration;
-                globalAudio.currentTime = seekTo;
-            }
-        });
-
-        // Format angka ke menit:detik (contoh: 01:05)
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
+        const G_API_URL = "/api/get-audio";
     </script>
+
+    <!-- Panggil File JS Eksternal -->
+    <script src="{{ asset('js/mushaf.js') }}"></script>
 
 </body>
 

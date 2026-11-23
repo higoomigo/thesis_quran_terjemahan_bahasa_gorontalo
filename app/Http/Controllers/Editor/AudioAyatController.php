@@ -177,7 +177,7 @@ class AudioAyatController extends Controller
             AudioArab::updateOrCreate(
                 [
                     'ayat_id'    => $ayat->id,
-                    'pelantun_id'    => $request->qari_id,
+                    'pelantun_id'    => $request->pelantun_id,
                     'langgam_id' => $request->langgam_id,
                 ],
                 [

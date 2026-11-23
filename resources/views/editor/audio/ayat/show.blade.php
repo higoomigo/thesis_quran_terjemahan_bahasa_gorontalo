@@ -426,7 +426,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-700 mb-1">Qari (Arab)</label>
-                                <select name="qari_id" x-bind:required="jenisAudio === 'arab'" class="w-full rounded-lg border-gray-300 bg-white py-2 px-3 text-xs focus:border-emerald-500 outline-none">
+                                <select name="pelantun_id" x-bind:required="jenisAudio === 'arab'" class="w-full rounded-lg border-gray-300 bg-white py-2 px-3 text-xs focus:border-emerald-500 outline-none">
                                     <option value="">-- Pilih Qari --</option>
                                     @foreach($qarisModal as $q) 
                                         <option value="{{ $q->id }}">{{ $q->nama }}</option> 

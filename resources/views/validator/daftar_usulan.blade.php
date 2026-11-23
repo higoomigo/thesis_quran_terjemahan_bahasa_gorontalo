@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
@@ -26,115 +26,8 @@
             opacity: 0.03
         }
     </style>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "outline": "#6f7973",
-                        "on-secondary-container": "#682c00",
-                        "surface-container-low": "#f0f3ff",
-                        "on-error-container": "#93000a",
-                        "on-background": "#151c27",
-                        "on-tertiary-fixed": "#002115",
-                        "on-tertiary-container": "#a8d0bc",
-                        "on-primary-fixed-variant": "#00513b",
-                        "surface-container-lowest": "#ffffff",
-                        "tertiary-fixed-dim": "#a8cfbc",
-                        "on-secondary": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "surface-container-highest": "#dce2f3",
-                        "background": "#f9f9ff",
-                        "outline-variant": "#bec9c2",
-                        "on-primary": "#ffffff",
-                        "inverse-on-surface": "#ebf1ff",
-                        "tertiary-fixed": "#c3ecd7",
-                        "surface-dim": "#d3daea",
-                        "on-tertiary-fixed-variant": "#294e3f",
-                        "secondary-fixed": "#ffdbca",
-                        "on-surface-variant": "#3f4944",
-                        "secondary-container": "#fd8a42",
-                        "primary": "#004532",
-                        "inverse-primary": "#8bd6b6",
-                        "on-tertiary": "#ffffff",
-                        "surface-variant": "#dce2f3",
-                        "on-error": "#ffffff",
-                        "on-primary-container": "#8bd6b7",
-                        "surface-tint": "#1b6b51",
-                        "error": "#ba1a1a",
-                        "tertiary": "#1e4334",
-                        "primary-fixed-dim": "#8bd6b6",
-                        "on-surface": "#151c27",
-                        "tertiary-container": "#365a4a",
-                        "surface-container": "#e7eefe",
-                        "surface-container-high": "#e2e8f8",
-                        "secondary-fixed-dim": "#ffb68e",
-                        "on-secondary-fixed": "#331200",
-                        "secondary": "#9b4500",
-                        "inverse-surface": "#2a313d",
-                        "on-secondary-fixed-variant": "#763300",
-                        "primary-container": "#065f46",
-                        "surface-bright": "#f9f9ff",
-                        "on-primary-fixed": "#002116",
-                        "primary-fixed": "#a6f2d1",
-                        "surface": "#f9f9ff"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "md": "1rem",
-                        "unit": "4px",
-                        "xl": "2.5rem",
-                        "gutter": "1.5rem",
-                        "xs": "0.25rem",
-                        "sm": "0.5rem",
-                        "lg": "1.5rem",
-                        "container-max": "1200px"
-                    },
-                    "fontFamily": {
-                        "body-reading-arabic": ["Noto Serif"],
-                        "caption": ["Inter"],
-                        "headline-lg": ["Inter"],
-                        "label-md": ["Inter"],
-                        "body-reading-translation": ["Inter"],
-                        "headline-xl": ["Inter"]
-                    },
-                    "fontSize": {
-                        "body-reading-arabic": ["32px", {
-                            "lineHeight": "2.0",
-                            "fontWeight": "400"
-                        }],
-                        "caption": ["12px", {
-                            "lineHeight": "1.4",
-                            "fontWeight": "400"
-                        }],
-                        "headline-lg": ["28px", {
-                            "lineHeight": "1.3",
-                            "fontWeight": "600"
-                        }],
-                        "label-md": ["14px", {
-                            "lineHeight": "1.4",
-                            "letterSpacing": "0.02em",
-                            "fontWeight": "500"
-                        }],
-                        "body-reading-translation": ["18px", {
-                            "lineHeight": "1.6",
-                            "fontWeight": "400"
-                        }],
-                        "headline-xl": ["36px", {
-                            "lineHeight": "1.2",
-                            "fontWeight": "700"
-                        }]
-                    }
-                },
-            },
-        }
-    </script>
+    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="font-body-reading-translation text-on-background">

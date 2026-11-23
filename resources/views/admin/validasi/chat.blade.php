@@ -121,7 +121,7 @@
                         $usulan->assignments->count() >= 3)
                     <button id="triggerVoteBtn"
                         class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-colors">
-                        <span class="material-symbols-outlined text-[20px]">how_to_vote</span> Mulai Voting
+                        <span class="material-symbols-outlined text-[20px]">how_to_vote</span> Mulai Validasi
                     </button>
                 @endif
             </header>
@@ -475,7 +475,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#059669',
                 cancelButtonColor: '#dc2626',
-                confirmButtonText: 'Ya, Mulai Voting',
+                confirmButtonText: 'Ya, Mulai Validasi',
                 cancelButtonText: 'Batal'
             });
             if (!confirm.isConfirmed) return;
@@ -509,7 +509,7 @@
 
                     document.getElementById('triggerVoteBtn')?.remove();
                 } else {
-                    Swal.fire('Gagal', result.error || 'Tidak dapat memulai voting', 'error');
+                    Swal.fire('Gagal', result.error || 'Tidak dapat memulai validasi', 'error');
                 }
             } catch (e) {
                 Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');

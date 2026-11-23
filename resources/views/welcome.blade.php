@@ -6,56 +6,12 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Hulontalo Qur'an - Landing Page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     @include('partials.pwa')
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        emerald: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            200: '#a7f3d0',
-                            300: '#6ee7b7',
-                            400: '#34d399',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                            950: '#022c22',
-                        },
-                        slate: {
-                            50: '#f8fafc',
-                            100: '#f1f5f9',
-                            200: '#e2e8f0',
-                            300: '#cbd5e1',
-                            400: '#94a3b8',
-                            500: '#64748b',
-                            600: '#475569',
-                            700: '#334155',
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
-                        },
-                        surface: {
-                            DEFAULT: '#f9f9ff',
-                            dark: '#1e293b'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Noto Serif', 'serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    
 
     <!-- Add CSS ini di dalam <head> -->
     <style>
@@ -69,6 +25,7 @@
             visibility: hidden;
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-surface text-slate-900 font-sans min-h-screen flex flex-col antialiased">
@@ -147,7 +104,7 @@
                 <div class="flex flex-wrap justify-center items-center gap-10 md:gap-16 lg:gap-24">
 
 
-                    <div class="group flex items-center justify-center cursor-pointer"
+                    <div class="group flex itemsk-center justify-center cursor-pointer"
                         title="Pemerintah Provinsi Gorontalo">
                         <img src="{{ asset('img/pemprov.png') }}" alt="Pemprov Gorontalo"
                             class="h-16 md:h-20 lg:h-24 object-contain  transition-all duration-300">

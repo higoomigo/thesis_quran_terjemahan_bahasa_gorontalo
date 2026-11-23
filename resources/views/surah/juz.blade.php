@@ -5,76 +5,11 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Qur'an Gorontalo - Juz {{ $juz_id }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet" />
     @include('partials.pwa')
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-fixed": "#a6f2d1",
-                        "surface": "#f9f9ff",
-                        "on-tertiary-container": "#a8d0bc",
-                        "on-secondary-fixed": "#331200",
-                        "tertiary": "#1e4334",
-                        "surface-bright": "#f9f9ff",
-                        "secondary-container": "#fd8a42",
-                        "error": "#ba1a1a",
-                        "tertiary-container": "#365a4a",
-                        "surface-tint": "#1b6b51",
-                        "on-tertiary-fixed": "#002115",
-                        "primary-fixed-dim": "#8bd6b6",
-                        "on-primary-fixed": "#002116",
-                        "inverse-surface": "#2a313d",
-                        "on-primary-container": "#8bd6b7",
-                        "on-background": "#151c27",
-                        "background": "#f9f9ff",
-                        "tertiary-fixed-dim": "#a8cfbc",
-                        "secondary": "#9b4500",
-                        "on-primary": "#ffffff",
-                        "surface-container-low": "#f0f3ff",
-                        "inverse-primary": "#8bd6b6",
-                        "on-secondary-container": "#682c00",
-                        "on-surface": "#151c27",
-                        "primary-container": "#065f46",
-                        "on-tertiary": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "surface-container-lowest": "#ffffff",
-                        "on-surface-variant": "#3f4944",
-                        "primary": "#004532",
-                        "surface-container-high": "#e2e8f8",
-                        "secondary-fixed": "#ffdbca",
-                        "on-error-container": "#93000a",
-                        "surface-container-highest": "#dce2f3",
-                        "on-secondary-fixed-variant": "#763300",
-                        "outline": "#6f7973",
-                        "on-primary-fixed-variant": "#00513b",
-                        "on-secondary": "#ffffff",
-                        "on-error": "#ffffff",
-                        "tertiary-fixed": "#c3ecd7",
-                        "surface-dim": "#d3daea",
-                        "surface-container": "#e7eefe",
-                        "inverse-on-surface": "#ebf1ff",
-                        "outline-variant": "#bec9c2",
-                        "surface-variant": "#dce2f3",
-                        "secondary-fixed-dim": "#ffb68e",
-                        "on-tertiary-fixed-variant": "#294e3f"
-                    },
-                    "fontFamily": {
-                        "label-md": ["Inter"],
-                        "caption": ["Inter"],
-                        "headline-lg": ["Inter"],
-                        "headline-xl": ["Inter"],
-                        "body-reading-translation": ["Inter"],
-                        "body-reading-arabic": ["Noto Serif"]
-                    }
-                }
-            }
-        }
-    </script>
+    
     <style>
         body { background-color: #fafafa; }
         .ayah-card { transition: all 0.2s ease; }
@@ -88,6 +23,7 @@
         #loading-screen.hidden-loader { opacity: 0; visibility: hidden; }
         .surah-divider { background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23a6f2d1" fill-opacity="0.1" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E'); }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="text-on-surface antialiased min-h-screen flex flex-col relative overflow-x-hidden">
@@ -254,7 +190,7 @@
                             </button>
 
                             <a href="{{ route('usulan.index', ['surah_id' => $ayat->no_surah, 'ayat_id' =>$ayat->nomorAyat]) }}" class="text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-1.5 font-bold text-sm sm:ml-auto">
-                                <span class="material-symbols-outlined text-[20px]">history_edu</span> Riwayat & Usulan
+                                <span class="material-symbols-outlined text-[20px]">history_edu</span> Histori Usulan 
                             </a>
                         </div>
                     </div>

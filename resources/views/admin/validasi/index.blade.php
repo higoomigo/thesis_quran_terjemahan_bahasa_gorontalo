@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Antrean Otorisasi | Admin Panel - Qur'an Gorontalo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;display=swap"
         rel="stylesheet" />
@@ -54,6 +54,7 @@
         }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-gray-50 text-gray-900 min-h-screen flex">

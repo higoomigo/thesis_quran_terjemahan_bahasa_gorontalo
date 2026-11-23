@@ -27,8 +27,8 @@ class AppServiceProvider extends ServiceProvider
         // Mengubah locale sistem PHP (opsional, untuk fungsi native date())
         setlocale(LC_TIME, 'id_ID.UTF-8'); 
 
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
+        // if (config('app.env') === 'production') {
+        //     URL::forceScheme('https');
+        // }
     }
 }

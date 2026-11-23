@@ -5,42 +5,10 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Login - Hulontalo Qur'an</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary-fixed": "#a6f2d1", "surface": "#f9f9ff", "on-tertiary-container": "#a8d0bc",
-                        "on-secondary-fixed": "#331200", "tertiary": "#1e4334", "surface-bright": "#f9f9ff",
-                        "secondary-container": "#fd8a42", "error": "#ba1a1a", "tertiary-container": "#365a4a",
-                        "surface-tint": "#1b6b51", "on-tertiary-fixed": "#002115", "primary-fixed-dim": "#8bd6b6",
-                        "on-primary-fixed": "#002116", "inverse-surface": "#2a313d", "on-primary-container": "#8bd6b7",
-                        "on-background": "#151c27", "background": "#f9f9ff", "tertiary-fixed-dim": "#a8cfbc",
-                        "secondary": "#9b4500", "on-primary": "#ffffff", "surface-container-low": "#f0f3ff",
-                        "inverse-primary": "#8bd6b6", "on-secondary-container": "#682c00", "on-surface": "#151c27",
-                        "primary-container": "#065f46", "on-tertiary": "#ffffff", "error-container": "#ffdad6",
-                        "surface-container-lowest": "#ffffff", "on-surface-variant": "#3f4944", "primary": "#004532",
-                        "surface-container-high": "#e2e8f8", "secondary-fixed": "#ffdbca", "on-error-container": "#93000a",
-                        "surface-container-highest": "#dce2f3", "on-secondary-fixed-variant": "#763300", "outline": "#6f7973",
-                        "on-primary-fixed-variant": "#00513b", "on-secondary": "#ffffff", "on-error": "#ffffff",
-                        "tertiary-fixed": "#c3ecd7", "surface-dim": "#d3daea", "surface-container": "#e7eefe",
-                        "inverse-on-surface": "#ebf1ff", "outline-variant": "#bec9c2", "surface-variant": "#dce2f3",
-                        "secondary-fixed-dim": "#ffb68e", "on-tertiary-fixed-variant": "#294e3f"
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                    spacing: { "sm": "0.5rem", "xl": "2.5rem", "unit": "4px", "gutter": "1.5rem", "container-max": "1200px", "md": "1rem", "lg": "1.5rem", "xs": "0.25rem" },
-                    fontFamily: {
-                        "label-md": ["Inter"], "caption": ["Inter"], "body-reading-translation": ["Inter"],
-                        "headline-lg": ["Inter"], "headline-xl": ["Inter"], "body-reading-arabic": ["Noto Serif"]
-                    }
-                }
-            }
-        }
-    </script>
+    
     <style>
         body { background-color: theme('colors.surface'); }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
@@ -54,6 +22,7 @@
             background-blend-mode: soft-light;
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="min-h-screen flex text-on-background">
